@@ -39,36 +39,18 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th>1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>
-                  <button class="btn btn-success">View</button>
-                  <button class="btn btn-warning mx-2">Update</button>
-                  <button class="btn btn-danger">Delete</button>
-                </td>
-              </tr>
-              <tr>
-                <th>2</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>
-                  <button class="btn btn-success">View</button>
-                  <button class="btn btn-warning mx-2">Update</button>
-                  <button class="btn btn-danger">Delete</button>
-                </td>
-              </tr>
-              <tr>
-                <th>3</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>
-                  <button class="btn btn-success">View</button>
-                  <button class="btn btn-warning mx-2">Update</button>
-                  <button class="btn btn-danger">Delete</button>
-                </td>
-              </tr>
+              <c:forEach var="user" items="${users1}">
+                <tr>
+                  <th>${user.id}</th>
+                  <td>${user.email}</td>
+                  <td>${user.fullName}</td>
+                  <td>
+                    <button class="btn btn-success">View</button>
+                    <button class="btn btn-warning mx-2">Update</button>
+                    <button class="btn btn-danger">Delete</button>
+                  </td>
+                </tr>
+              </c:forEach>
             </tbody>
           </table>
         </div>
