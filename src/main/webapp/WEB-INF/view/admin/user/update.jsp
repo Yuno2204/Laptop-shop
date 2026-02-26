@@ -5,7 +5,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create User</title>
+    <title>Update User</title>
     <!-- Latest compiled and minified CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -22,23 +22,25 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
     <div class="container mt-5">
       <div class="row">
         <div class="col-md-6 clo-12 mx-auto">
-          <h4>Create New User</h4>
+          <h4>Update User</h4>
           <hr />
           <form:form
             method="post"
-            action="/admin/user/create"
+            action="/admin/user/update"
             modelAttribute="newUser"
           >
+            <div class="mb-3" style="display: none">
+              <label class="form-label">ID:</label>
+              <form:input type="text" class="form-control" path="id" />
+            </div>
+
             <div class="mb-3">
               <label class="form-label">Email:</label>
-              <form:input type="email" class="form-control" path="email" />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Password:</label>
               <form:input
-                type="password"
+                type="email"
                 class="form-control"
-                path="password"
+                path="email"
+                disabled="true"
               />
             </div>
             <div class="mb-3">
@@ -54,7 +56,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
               <form:input type="text" class="form-control" path="address" />
             </div>
 
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" class="btn btn-warning">Update</button>
           </form:form>
         </div>
       </div>
