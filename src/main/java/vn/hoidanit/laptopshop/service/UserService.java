@@ -32,4 +32,8 @@ public class UserService {
         System.out.println(cen);
         return cen;
     }
+
+    public User getUserByID(long id) {
+        return this.userRepository.findById(id);
+    }
 }

@@ -45,7 +45,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
                   <td>${user.email}</td>
                   <td>${user.fullName}</td>
                   <td>
-                    <button class="btn btn-success">View</button>
+                    <a href="/admin/user/${user.id}" class="btn btn-success">View</a>
                     <button class="btn btn-warning mx-2">Update</button>
                     <button class="btn btn-danger">Delete</button>
                   </td>
