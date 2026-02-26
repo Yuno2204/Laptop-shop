@@ -5,7 +5,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Table User</title>
+    <title>Danh sách người dùng</title>
     <!-- Latest compiled and minified CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -23,9 +23,9 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
       <div class="row">
         <div class="clo-12 mx-auto">
           <div class="d-flex justify-content-between">
-            <h3>Table Users</h3>
+            <h3>Danh sách người dùng</h3>
             <a href="/admin/user/create" class="btn btn-primary">
-              Create a user</a
+              Thêm người dùng</a
             >
           </div>
           <hr />
@@ -45,9 +45,9 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
                   <td>${user.email}</td>
                   <td>${user.fullName}</td>
                   <td>
-                    <a href="/admin/user/${user.id}" class="btn btn-success">View</a>
-                    <a href="/admin/user/update/${user.id}" class="btn btn-warning mx-2">Update</a>
-                    <a href="/admin/user/delete/${user.id}" class="btn btn-danger">Delete</a>
+                    <a href="/admin/user/${user.id}" class="btn btn-success">Xem chi tiết</a>
+                    <a href="/admin/user/update/${user.id}" class="btn btn-warning mx-2">Cập nhật</a>
+                    <a href="/admin/user/delete/${user.id}" class="btn btn-danger">Xóa</a>
                   </td>
                 </tr>
               </c:forEach>

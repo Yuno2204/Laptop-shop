@@ -5,7 +5,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Details ${id}</title>
+    <title>Thông tin chi tiết người dùng với id = ${id}</title>
     <!-- Latest compiled and minified CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -23,7 +23,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
       <div class="row">
         <div class="clo-12 mx-auto">
           <div class="d-flex justify-content-between">
-            <h3>Users detail with id = ${id}</h3>
+            <h3>Thông tin chi tiết người dùng với id =  ${id}</h3>
           </div>
           <hr />
           <div class="card" style="width: 60%">
@@ -35,7 +35,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
               <li class="list-group-item">Address: ${user.address}</li>
             </ul>
           </div>
-          <a href="/admin/user" class="btn btn-success mt-3">Back</a>
+          <a href="/admin/user" class="btn btn-success mt-3">Quay lại</a>
         </div>
       </div>
     </div>

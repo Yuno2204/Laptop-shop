@@ -5,7 +5,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Update User</title>
+    <title>Cập nhật thông tin người dùng</title>
     <!-- Latest compiled and minified CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -22,7 +22,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
     <div class="container mt-5">
       <div class="row">
         <div class="col-md-6 clo-12 mx-auto">
-          <h4>Update User</h4>
+          <h4>Cập nhật thông tin người dùng</h4>
           <hr />
           <form:form
             method="post"
@@ -56,7 +56,7 @@ uri="http://www.springframework.org/tags/form" prefix="form"%>
               <form:input type="text" class="form-control" path="address" />
             </div>
 
-            <button type="submit" class="btn btn-warning">Update</button>
+            <button type="submit" class="btn btn-warning">Cập nhật</button>
           </form:form>
         </div>
       </div>
