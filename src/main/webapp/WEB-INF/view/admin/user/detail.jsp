@@ -10,10 +10,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="Đinh Quang Đức - Dự án laptopshop" />
         <meta name="author" content="Đinh Quang Đức" />
-        <title>Cập nhật thông tin người dùng</title>
+        <title>Thông tin chi tiết người dùng với id = ${id}</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
         <link href="/css/styles.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
       </head>
 
       <body class="sb-nav-fixed">
@@ -29,41 +30,24 @@
                 </ol>
                 <div class="container mt-5">
                   <div class="row">
-                    <div class="col-md-6 clo-12 mx-auto">
-                      <h4>Cập nhật thông tin người dùng</h4>
+                    <div class="clo-12 mx-auto">
+                      <div class="d-flex justify-content-between">
+                        <h3>Thông tin chi tiết người dùng với id = ${id}</h3>
+                      </div>
                       <hr />
-                      <form:form method="post" action="/admin/user/update" modelAttribute="newUser">
-                        <div class="mb-3" style="display: none">
-                          <label class="form-label">ID:</label>
-                          <form:input type="text" class="form-control" path="id" />
-                        </div>
-
-                        <div class="mb-3">
-                          <label class="form-label">Email:</label>
-                          <form:input type="email" class="form-control" path="email" disabled="true" />
-                        </div>
-                        <div class="mb-3">
-                          <label class="form-label">Phone number:</label>
-                          <form:input type="text" class="form-control" path="phone" />
-                        </div>
-                        <div class="mb-3">
-                          <label class="form-label">Full Name:</label>
-                          <form:input type="text" class="form-control" path="fullName" />
-                        </div>
-                        <div class="mb-3">
-                          <label class="form-label">Address:</label>
-                          <form:input type="text" class="form-control" path="address" />
-                        </div>
-                        <div class="d-flex justify-content-between">
-                          <button type="submit" class="btn btn-warning">Cập nhật</button>
-                          <a href="/admin/user" class="btn btn-success">Quay lại</a>
-                        </div>
-
-                      </form:form>
+                      <div class="card" style="width: 60%">
+                        <div class="card-header">User Information</div>
+                        <ul class="list-group list-group-flush">
+                          <li class="list-group-item">ID: ${user.id}</li>
+                          <li class="list-group-item">Email: ${user.email}</li>
+                          <li class="list-group-item">Full Name:${user.fullName}</li>
+                          <li class="list-group-item">Address: ${user.address}</li>
+                        </ul>
+                      </div>
+                      <a href="/admin/user" class="btn btn-success mt-3">Quay lại</a>
                     </div>
                   </div>
                 </div>
-
               </div>
             </main>
             <jsp:include page="../layout/footer.jsp"></jsp:include>

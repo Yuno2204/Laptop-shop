@@ -10,7 +10,7 @@
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
                 <meta name="description" content="Đinh Quang Đức - Dự án laptopshop" />
                 <meta name="author" content="Đinh Quang Đức" />
-                <title>Xóa người dùng với id = ${id}</title>
+                <title>Dashboard</title>
                 <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
                 <link href="/css/styles.css" rel="stylesheet" />
                 <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -23,34 +23,11 @@
                     <div id="layoutSidenav_content">
                         <main>
                             <div class="container-fluid px-4">
-                                <h1 class="mt-4">Quản lý Users</h1>
+                                <h1 class="mt-4">Quản lý Products</h1>
                                 <ol class="breadcrumb mb-4">
                                     <li class="breadcrumb-item active"><a href="/admin">Dashboard</a></li>
                                 </ol>
-                                <div class="container mt-5">
-                                    <div class="row">
-                                        <div class="clo-12 mx-auto">
-                                            <h3>Xóa người dùng với id = ${id}</h3>
-                                            <hr />
-                                            <div class="alert alert-danger" role="alert">
-                                                Bạn có chắn chắc muốn xóa người dùng không?
-                                            </div>
-                                            <form:form method="post" action="/admin/user/delete"
-                                                modelAttribute="newUser">
-                                                <div class="mb-3" style="display: none">
-                                                    <label class="form-label">ID:</label>
-                                                    <form:input value="${id}" type="text" class="form-control"
-                                                        path="id" />
-                                                </div>
-                                                <div class="d-flex justify-content-between">
-                                                    <button class="btn btn-danger">Xác Nhận</button>
-                                                    <a href="/admin/user" class="btn btn-success">Quay lại</a>
-                                                </div>
-                                            </form:form>
-                                        </div>
-                                    </div>
-                                </div>
-
+                                <li class="breadcrumb-item active">product</li>
                             </div>
                         </main>
                         <jsp:include page="../layout/footer.jsp"></jsp:include>
