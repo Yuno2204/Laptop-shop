@@ -31,7 +31,7 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user")
-    List<Order> orders;
+    private List<Order> orders;
 
     public long getId() {
         return id;
