@@ -2,6 +2,8 @@ package vn.hoidanit.laptopshop.controller.admin;
 
 import java.util.List;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,16 +11,23 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import vn.hoidanit.laptopshop.domain.User;
+import vn.hoidanit.laptopshop.service.UploadService;
 import vn.hoidanit.laptopshop.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class UserController {
     private final UserService userService;
+    private final UploadService uploadService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UploadService uploadService,
+            PasswordEncoder passwordEncoder) {
         this.userService = userService;
-
+        this.uploadService = uploadService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/")
@@ -43,7 +52,13 @@ public class UserController {
     }
 
     @PostMapping("/admin/user/create")
-    public String createUserPage(Model model, @ModelAttribute("newUser") User cen) {
+    public String createUserPage(Model model, @ModelAttribute("newUser") User cen,
+            @RequestParam("imagesFile") MultipartFile file) {
+        String avatar = this.uploadService.handleSaveUploadFile(file, "avatar");
+        String hashPassword = this.passwordEncoder.encode(cen.getPassword());
+        cen.setAvatar(avatar);
+        cen.setPassword(hashPassword);
+        cen.setRole(this.userService.getRoleByName(cen.getRole().getName()));
         this.userService.handleSaveUser(cen);
         return "redirect:/admin/user";
     }
