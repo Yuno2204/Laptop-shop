@@ -103,7 +103,8 @@
                                                         class="form-control form-control-sm text-center border-0"
                                                         value="${cartDetail.quantity}"
                                                         data-cart-detail-id="${cartDetail.id}"
-                                                        data-cart-detail-price="${cartDetail.price}">
+                                                        data-cart-detail-price="${cartDetail.price}"
+                                                        data-cart-detail-price="${status.index}">
                                                     <div class="input-group-btn">
                                                         <button
                                                             class="btn btn-sm btn-plus rounded-circle bg-light border">
@@ -158,58 +159,76 @@
                                             <fmt:formatNumber type="number" value="${totalPrice}" /> đ
                                         </p>
                                     </div>
-                                    <button
-                                        class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4"
-                                        type="button">Proceed Checkout</button>
+                                    <div>
+                                        <form action="/confirm-checkout" method="post" id="confirm-checkout-form">
+                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+
+                                            <div style="display: none;">
+                                                <c:forEach var="cartDetail" items="${cartDetails}" varStatus="status">
+                                                    <input type="hidden" name="cartDetails[${status.index}].id"
+                                                        value="${cartDetail.id}" />
+                                                    <input type="hidden" name="cartDetails[${status.index}].quantity"
+                                                        value="${cartDetail.quantity}"
+                                                        id="hidden-qty-${cartDetail.id}" />
+                                                </c:forEach>
+                                            </div>
+                                        </form>
+
+                                        <!-- Button submit form trên -->
+                                        <button
+                                            class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4"
+                                            type="button" id="btn-confirm-checkout">
+                                            Xác nhận thanh toán
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- Cart Page End -->
+                    <!-- Cart Page End -->
 
-                <jsp:include page="../layout/footer.jsp" />
-
-
-                <!-- Back to Top -->
-                <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-                        class="fa fa-arrow-up"></i></a>
+                    <jsp:include page="../layout/footer.jsp" />
 
 
-                <!-- JavaScript Libraries -->
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-                <script src="/client/lib/easing/easing.min.js"></script>
-                <script src="/client/lib/waypoints/waypoints.min.js"></script>
-                <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-                <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+                    <!-- Back to Top -->
+                    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                            class="fa fa-arrow-up"></i></a>
 
-                <!-- Template Javascript -->
-                <script src="/client/js/main.js"></script>
-                <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Xác nhận xóa sản phẩm</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
 
-                            <div class="modal-body">
-                                Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng không?
-                            </div>
+                    <!-- JavaScript Libraries -->
+                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+                    <script src="/client/lib/easing/easing.min.js"></script>
+                    <script src="/client/lib/waypoints/waypoints.min.js"></script>
+                    <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+                    <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <!-- Template Javascript -->
+                    <script src="/client/js/main.js"></script>
+                    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Xác nhận xóa sản phẩm</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
 
-                                <form id="delete-cart-form" method="post" action="">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                    <button type="submit" class="btn btn-danger">Xóa</button>
-                                </form>
+                                <div class="modal-body">
+                                    Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng không?
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+
+                                    <form id="delete-cart-form" method="post" action="">
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                        <button type="submit" class="btn btn-danger">Xóa</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
             </body>
 
             </html>

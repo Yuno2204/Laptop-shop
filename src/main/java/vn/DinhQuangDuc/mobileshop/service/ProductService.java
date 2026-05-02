@@ -113,4 +113,17 @@ public class ProductService {
             }
         }
     }
+
+    public void handleUpdateCartBeforeCheckout(List<CartDetail> cartDetails) {
+        for (CartDetail cartDetail : cartDetails) {
+            Optional<CartDetail> optional = this.cartDetailRepository.findById(cartDetail.getId());
+
+            if (optional.isPresent()) {
+                CartDetail currentCartDetail = optional.get();
+                currentCartDetail.setQuantity(cartDetail.getQuantity());
+
+                this.cartDetailRepository.save(currentCartDetail);
+            }
+        }
+    }
 }

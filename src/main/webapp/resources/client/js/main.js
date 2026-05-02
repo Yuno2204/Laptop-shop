@@ -152,6 +152,9 @@
         }
 
         input.val(newVal);
+        const index = input.attr("data-cart-detail-index");
+        const el = document.getElementById(`cartDetails${index}.quantity`);
+        $(el).val(newVal);
 
         // get price
         const price = +input.attr("data-cart-detail-price");
@@ -196,6 +199,19 @@
     $(document).on('click', '.btn-delete-cart', function () {
     const cartDetailId = $(this).attr('data-cart-detail-id');
     $('#delete-cart-form').attr('action', '/delete-cart-product/' + cartDetailId);
+});
+document.getElementById("btn-confirm-checkout").addEventListener("click", function () {
+    // Lấy tất cả input quantity đang hiển thị
+    document.querySelectorAll("input[data-cart-detail-id]").forEach(function (input) {
+        var id = input.getAttribute("data-cart-detail-id");
+        var qty = input.value;
+        // Cập nhật vào hidden input tương ứng
+        var hiddenInput = document.getElementById("hidden-qty-" + id);
+        if (hiddenInput) {
+            hiddenInput.value = qty;
+        }
+    });
+    document.getElementById("confirm-checkout-form").submit();
 });
 })(jQuery);
 
