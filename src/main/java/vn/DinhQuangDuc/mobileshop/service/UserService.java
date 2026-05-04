@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import vn.DinhQuangDuc.mobileshop.domain.Role;
 import vn.DinhQuangDuc.mobileshop.domain.User;
 import vn.DinhQuangDuc.mobileshop.dto.RegisterDTO;
+import vn.DinhQuangDuc.mobileshop.repository.OrderRepository;
+import vn.DinhQuangDuc.mobileshop.repository.ProductRepository;
 import vn.DinhQuangDuc.mobileshop.repository.RoleRepository;
 import vn.DinhQuangDuc.mobileshop.repository.UserRepository;
 
@@ -14,10 +16,15 @@ import vn.DinhQuangDuc.mobileshop.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository,
+            ProductRepository productRepository, OrderRepository orderRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
     }
 
     public String handleHello() {
@@ -64,5 +71,17 @@ public class UserService {
 
     public User getUserByEmail(String email) {
         return this.userRepository.findByEmail(email);
+    }
+
+    public long countUsers() {
+        return this.userRepository.count();
+    }
+
+    public long countProducts() {
+        return this.productRepository.count();
+    }
+
+    public long countOrders() {
+        return this.orderRepository.count();
     }
 }
