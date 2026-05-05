@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import vn.DinhQuangDuc.mobileshop.domain.Cart;
 import vn.DinhQuangDuc.mobileshop.domain.CartDetail;
+import vn.DinhQuangDuc.mobileshop.domain.Order;
 import vn.DinhQuangDuc.mobileshop.domain.Product;
 import vn.DinhQuangDuc.mobileshop.domain.User;
+import vn.DinhQuangDuc.mobileshop.service.OrderService;
 import vn.DinhQuangDuc.mobileshop.service.ProductService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ItemController {
 
     private final ProductService productService;
+    private final OrderService orderService;
 
-    public ItemController(ProductService productService) {
+    public ItemController(ProductService productService, OrderService orderService) {
         this.productService = productService;
+        this.orderService = orderService;
     }
 
     @GetMapping("/product/{id}")
@@ -124,4 +128,18 @@ public class ItemController {
         return "client/cart/thanks";
     }
 
+    @GetMapping("/order-history")
+    public String getOrderHistoryPage(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            long userId = (long) session.getAttribute("id");
+            User currentUser = new User();
+            currentUser.setId(userId);
+
+            // Bạn cần viết thêm hàm fetchOrderByUser trong OrderService
+            List<Order> orders = this.orderService.fetchOrderByUser(currentUser);
+            model.addAttribute("orders", orders);
+        }
+        return "client/cart/order-history";
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import vn.DinhQuangDuc.mobileshop.domain.Order;
 import vn.DinhQuangDuc.mobileshop.domain.OrderDetail;
+import vn.DinhQuangDuc.mobileshop.domain.User;
 import vn.DinhQuangDuc.mobileshop.repository.OrderDetailRepository;
 import vn.DinhQuangDuc.mobileshop.repository.OrderRepository;
 
@@ -53,5 +54,9 @@ public class OrderService {
             // Sau đó mới xóa đơn hàng chính
             this.orderRepository.deleteById(id);
         }
+    }
+
+    public List<Order> fetchOrderByUser(User user) {
+        return this.orderRepository.findByUser(user);
     }
 }
