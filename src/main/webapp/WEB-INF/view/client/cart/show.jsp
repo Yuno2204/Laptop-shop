@@ -104,7 +104,8 @@
                                                         value="${cartDetail.quantity}"
                                                         data-cart-detail-id="${cartDetail.id}"
                                                         data-cart-detail-price="${cartDetail.price}"
-                                                        data-cart-detail-price="${status.index}">
+                                                        data-cart-detail-index="${status.index}"
+                                                        data-stock="${cartDetail.product.quantity}">
                                                     <div class="input-group-btn">
                                                         <button
                                                             class="btn btn-sm btn-plus rounded-circle bg-light border">

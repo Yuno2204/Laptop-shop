@@ -8,7 +8,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import vn.DinhQuangDuc.mobileshop.domain.Cart;
 import vn.DinhQuangDuc.mobileshop.domain.CartDetail;
 import vn.DinhQuangDuc.mobileshop.domain.Order;
@@ -16,12 +21,6 @@ import vn.DinhQuangDuc.mobileshop.domain.Product;
 import vn.DinhQuangDuc.mobileshop.domain.User;
 import vn.DinhQuangDuc.mobileshop.service.OrderService;
 import vn.DinhQuangDuc.mobileshop.service.ProductService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ItemController {
@@ -45,24 +44,34 @@ public class ItemController {
     @PostMapping("/add-product-to-cart/{id}")
     public String addProductToCart(@PathVariable long id, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        Long productId = id;
+        if (session == null || session.getAttribute("email") == null) {
+            return "redirect:/login";
+        }
+
         String email = (String) session.getAttribute("email");
-        this.productService.handleAddProductToCart(email, productId, session);
+        this.productService.handleAddProductToCart(email, id, session);
         return "redirect:/";
     }
 
     @GetMapping("/cart")
     public String getCartPage(Model model, HttpServletRequest request) {
-        User currentUser = new User();
         HttpSession session = request.getSession(false);
-        long id = (long) session.getAttribute("id");
-        currentUser.setId(id);
+        if (session == null || session.getAttribute("id") == null) {
+            return "redirect:/login";
+        }
+
+        long userId = (long) session.getAttribute("id");
+        User currentUser = new User();
+        currentUser.setId(userId);
+
         Cart cart = this.productService.fetchByUser(currentUser);
         List<CartDetail> cartDetails = cart == null ? new ArrayList<CartDetail>() : cart.getCartDetails();
+
         double totalPrice = 0;
         for (CartDetail cd : cartDetails) {
             totalPrice += cd.getPrice() * cd.getQuantity();
         }
+
         model.addAttribute("cartDetails", cartDetails);
         model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("cart", cart);
@@ -72,21 +81,25 @@ public class ItemController {
     @PostMapping("/delete-cart-product/{id}")
     public String deleteCartDetail(@PathVariable long id, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        long cartDetailId = id;
-        this.productService.handleRemoveCartDetail(cartDetailId, session);
+        if (session == null) {
+            return "redirect:/login";
+        }
+        this.productService.handleRemoveCartDetail(id, session);
         return "redirect:/cart";
     }
 
     @GetMapping("/checkout")
     public String getCheckOutPage(Model model, HttpServletRequest request) {
-
-        User currentUser = new User(); // null
         HttpSession session = request.getSession(false);
-        long id = (long) session.getAttribute("id");
-        currentUser.setId(id);
+        if (session == null || session.getAttribute("id") == null) {
+            return "redirect:/login";
+        }
+
+        long userId = (long) session.getAttribute("id");
+        User currentUser = new User();
+        currentUser.setId(userId);
 
         Cart cart = this.productService.fetchByUser(currentUser);
-
         List<CartDetail> cartDetails = cart == null ? new ArrayList<>() : cart.getCartDetails();
 
         double totalPrice = 0;
@@ -96,16 +109,13 @@ public class ItemController {
 
         model.addAttribute("cartDetails", cartDetails);
         model.addAttribute("totalPrice", totalPrice);
-
         return "client/cart/checkout";
     }
 
     @PostMapping("/confirm-checkout")
-    public String getCheckOutPage(@ModelAttribute("cart") Cart cart) {
+    public String confirmCheckout(@ModelAttribute("cart") Cart cart) {
         List<CartDetail> cartDetails = cart == null ? new ArrayList<>() : cart.getCartDetails();
-
         this.productService.handleUpdateCartBeforeCheckout(cartDetails);
-
         return "redirect:/checkout";
     }
 
@@ -114,32 +124,49 @@ public class ItemController {
             HttpServletRequest request,
             @RequestParam("receiverName") String receiverName,
             @RequestParam("receiverAddress") String receiverAddress,
-            @RequestParam("receiverPhone") String receiverPhone) {
-        User currentUser = new User(); // null
+            @RequestParam("receiverPhone") String receiverPhone,
+            RedirectAttributes redirectAttributes) {
+
         HttpSession session = request.getSession(false);
-        long id = (long) session.getAttribute("id");
-        currentUser.setId(id);
-        this.productService.handlePlaceOrder(currentUser, session, receiverName, receiverAddress, receiverPhone);
+        if (session == null || session.getAttribute("id") == null) {
+            return "redirect:/login";
+        }
+
+        long userId = (long) session.getAttribute("id");
+        User currentUser = new User();
+        currentUser.setId(userId);
+
+        // Gọi service xử lý đặt hàng (đã có logic kiểm tra tồn kho và trừ hàng)
+        String errorMsg = this.productService.handlePlaceOrder(currentUser, session, receiverName, receiverAddress,
+                receiverPhone);
+
+        if (errorMsg != null) {
+            redirectAttributes.addFlashAttribute("error", errorMsg);
+            return "redirect:/checkout";
+        }
+
         return "redirect:/thanks";
     }
 
     @GetMapping("/thanks")
-    public String getThankYouPage(Model model) {
+    public String getThankYouPage() {
         return "client/cart/thanks";
     }
 
     @GetMapping("/order-history")
     public String getOrderHistoryPage(Model model, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        if (session != null) {
-            long userId = (long) session.getAttribute("id");
-            User currentUser = new User();
-            currentUser.setId(userId);
-
-            // Bạn cần viết thêm hàm fetchOrderByUser trong OrderService
-            List<Order> orders = this.orderService.fetchOrderByUser(currentUser);
-            model.addAttribute("orders", orders);
+        if (session == null || session.getAttribute("id") == null) {
+            return "redirect:/login";
         }
+
+        long userId = (long) session.getAttribute("id");
+        User currentUser = new User();
+        currentUser.setId(userId);
+
+        List<Order> orders = this.orderService.fetchOrderByUser(currentUser);
+        model.addAttribute("orders", orders);
+
         return "client/cart/order-history";
     }
 }

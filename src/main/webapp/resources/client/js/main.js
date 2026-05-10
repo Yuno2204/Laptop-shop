@@ -132,29 +132,42 @@
 
 
    // Product Quantity
-    $('.quantity button').on('click', function () {
-        let change = 0;
-        const button = $(this);
-        const input = button.parent().parent().find('input');
-        const oldValue = parseFloat(input.val());
-        let newVal = oldValue;
+    $('.quantity button').on('click', function (e) {
+    let change = 0;
+    const button = $(this);
+    const input = button.parent().parent().find('input');
+    const oldValue = parseFloat(input.val());
+    let newVal = oldValue;
 
-        if (button.hasClass('btn-plus')) {
-            newVal = oldValue + 1;
-            change = 1;
-        } else {
-            if (oldValue > 1) {
-                newVal = oldValue - 1;
-                change = -1;
-            } else {
-                newVal = 1;
-            }
+    // Lấy tồn kho từ data-stock
+    const maxStock = parseFloat(input.attr("data-stock")); 
+
+    if (button.hasClass('btn-plus')) {
+        // ================= BẮT ĐẦU ĐOẠN KIỂM TRA =================
+        if (oldValue >= maxStock) {
+            alert('Số lượng sản phẩm không đủ. Chỉ còn ' + maxStock + ' sản phẩm trong kho.');
+            e.preventDefault();
+            return false; // Ngừng thực thi, không tăng giá trị
         }
+        // ==========================================================
+        
+        newVal = oldValue + 1;
+        change = 1;
+    } else {
+        if (oldValue > 1) {
+            newVal = oldValue - 1;
+            change = -1;
+        } else {
+            newVal = 1;
+        }
+    }
 
-        input.val(newVal);
-        const index = input.attr("data-cart-detail-index");
-        const el = document.getElementById(`cartDetails${index}.quantity`);
+    input.val(newVal);
+    const index = input.attr("data-cart-detail-index");
+    const el = document.getElementById(`cartDetails${index}.quantity`);
+    if(el) { // Cẩn thận check null
         $(el).val(newVal);
+    }
 
         // get price
         const price = +input.attr("data-cart-detail-price");

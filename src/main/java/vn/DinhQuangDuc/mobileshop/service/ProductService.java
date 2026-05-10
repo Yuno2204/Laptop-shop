@@ -136,12 +136,24 @@ public class ProductService {
         }
     }
 
-    public void handlePlaceOrder(User user, HttpSession session, String receiverName, String receiverAddress,
+    // Sửa kiểu trả về thành String
+    public String handlePlaceOrder(User user, HttpSession session, String receiverName, String receiverAddress,
             String receiverPhone) {
         Cart cart = this.cartRepository.findByUser(user);
         if (cart != null) {
             List<CartDetail> cartDetails = cart.getCartDetails();
             if (cartDetails != null && !cartDetails.isEmpty()) {
+
+                // ================= BƯỚC BỔ SUNG: KIỂM TRA TỒN KHO =================
+                for (CartDetail cd : cartDetails) {
+                    if (cd.getQuantity() > cd.getProduct().getQuantity()) {
+                        // Trả về thông báo lỗi nếu không đủ hàng
+                        return "Sản phẩm [" + cd.getProduct().getName() + "] không đủ số lượng. Chỉ còn "
+                                + cd.getProduct().getQuantity() + " sản phẩm.";
+                    }
+                }
+                // =================================================================
+
                 // Bước 1: Khởi tạo đối tượng Order
                 Order order = new Order();
                 order.setUser(user);
@@ -166,6 +178,13 @@ public class ProductService {
                     orderDetail.setPrice((long) cd.getPrice());
                     orderDetail.setQuantity(cd.getQuantity());
                     this.orderDetailRepository.save(orderDetail);
+
+                    // ================= BƯỚC BỔ SUNG: TRỪ TỒN KHO =================
+                    Product product = cd.getProduct();
+                    long newQuantity = product.getQuantity() - cd.getQuantity();
+                    product.setQuantity(newQuantity);
+                    this.productRepository.save(product); // Lưu lại số lượng mới
+                    // =============================================================
                 }
 
                 // Bước 4: Xóa dữ liệu giỏ hàng cũ
@@ -176,5 +195,6 @@ public class ProductService {
                 session.setAttribute("sum", 0);
             }
         }
+        return null; // Trả về null nghĩa là đặt hàng thành công
     }
 }
