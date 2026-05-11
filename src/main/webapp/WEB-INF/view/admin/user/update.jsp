@@ -50,6 +50,20 @@
                           <label class="form-label">Họ và tên:</label>
                           <form:input type="text" class="form-control" path="fullName" />
                         </div>
+                        <div class="row">
+                          <div class="col-md-6 mb-3">
+                            <label class="form-label">Giới tính:</label>
+                            <form:select path="gender" class="form-select">
+                              <form:option value="Nam">Nam</form:option>
+                              <form:option value="Nữ">Nữ</form:option>
+                              <form:option value="Khác">Khác</form:option>
+                            </form:select>
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label class="form-label">Ngày sinh:</label>
+                            <form:input type="date" path="dateOfBirth" class="form-control" />
+                          </div>
+                        </div>
                         <div class="mb-3">
                           <label class="form-label">Địa chỉ:</label>
                           <form:input type="text" class="form-control" path="address" />

@@ -51,6 +51,37 @@
                         font-weight: bold;
                         color: #81c408 !important;
                     }
+
+                    #nav-specs table {
+                        border-radius: 10px;
+                        overflow: hidden;
+                    }
+
+                    #nav-specs th {
+                        text-transform: uppercase;
+                        font-size: 0.85rem;
+                        letter-spacing: 1px;
+                        color: #6c757d;
+                    }
+
+                    #nav-specs td {
+                        padding: 15px 20px;
+                        font-size: 0.95rem;
+                    }
+
+                    #nav-specs tr:nth-child(even) {
+                        background-color: #fcfcfc;
+                    }
+
+                    /* Responsive cho mobile */
+                    @media (max-width: 576px) {
+
+                        #nav-specs td,
+                        #nav-specs th {
+                            padding: 10px 15px;
+                            font-size: 0.85rem;
+                        }
+                    }
                 </style>
             </head>
 
@@ -187,32 +218,79 @@
                             </nav>
                             <div class="tab-content" id="nav-tabContent">
                                 <div class="tab-pane fade show active" id="nav-desc" role="tabpanel">
-                                    <div class="bg-light p-4 p-md-5 rounded lh-lg text-secondary">
+                                    <div class="bg-white p-4 p-md-5 rounded shadow-sm border"
+                                        style="color: #000 !important; white-space: pre-line; line-height: 1.8;">
+                                        <h4 class="mb-4 fw-bold text-dark">Đặc điểm nổi bật</h4>
                                         ${product.detailDesc}
                                     </div>
                                 </div>
+
                                 <div class="tab-pane fade" id="nav-specs" role="tabpanel">
-                                    <div class="bg-light p-4 p-md-5 rounded">
-                                        <table class="table table-striped table-hover mb-0">
-                                            <tbody>
-                                                <tr>
-                                                    <th style="width: 30%">Thương hiệu</th>
-                                                    <td>${product.factory}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Nhu cầu sử dụng</th>
-                                                    <td>${product.target}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Tình trạng kho</th>
-                                                    <td>${product.quantity > 0 ? 'Còn hàng' : 'Hết hàng'}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Lượt bán</th>
-                                                    <td>${product.sold} sản phẩm</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                    <div class="bg-white p-4 p-md-5 rounded shadow-sm border">
+                                        <h4 class="mb-4 fw-bold text-dark"><i class="fas fa-microchip me-2"></i>Cấu hình
+                                            chi tiết</h4>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th style="width: 40%" class="py-3 ps-4">Thông số</th>
+                                                        <th style="width: 60%" class="py-3 ps-4">Giá trị</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">Thương hiệu</td>
+                                                        <td class="ps-4">${product.factory}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">Hệ điều hành</td>
+                                                        <td class="ps-4 text-primary fw-bold">${not empty product.os ?
+                                                            product.os : 'Đang cập nhật'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">Chip xử lý (CPU)</td>
+                                                        <td class="ps-4">${not empty product.cpu ? product.cpu : 'Đang
+                                                            cập nhật'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">RAM</td>
+                                                        <td class="ps-4">${not empty product.ram ? product.ram : 'Đang
+                                                            cập nhật'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">Bộ nhớ trong (ROM)</td>
+                                                        <td class="ps-4">${not empty product.rom ? product.rom : 'Đang
+                                                            cập nhật'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">Màn hình</td>
+                                                        <td class="ps-4">${not empty product.screenSize ?
+                                                            product.screenSize : 'Đang cập nhật'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">Tần số quét</td>
+                                                        <td class="ps-4">${not empty product.refreshRate ?
+                                                            product.refreshRate : 'Đang cập nhật'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">Dung lượng Pin</td>
+                                                        <td class="ps-4">${not empty product.battery ? product.battery :
+                                                            'Đang cập nhật'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">Công nghệ sạc nhanh</td>
+                                                        <td class="ps-4 text-success">${not empty product.fastCharge ?
+                                                            product.fastCharge : 'Đang cập nhật'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold ps-4 text-secondary">Nhu cầu sử dụng</td>
+                                                        <td class="ps-4"><span
+                                                                class="badge bg-info text-dark">${product.target}</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

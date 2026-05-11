@@ -96,16 +96,24 @@
                                                     <td>
                                                         <c:choose>
                                                             <c:when test="${order.status == 'PENDING'}">
-                                                                <span class="status-badge bg-secondary text-white">Chờ
+                                                                <span class="status-badge bg-secondary text-white">
+                                                                    <i class="fas fa-times-circle me-1"></i>Chờ
                                                                     xử lý</span>
                                                             </c:when>
                                                             <c:when test="${order.status == 'SHIPPING'}">
-                                                                <span class="status-badge bg-info text-white">Đang
+                                                                <span class="status-badge bg-info text-white">
+                                                                    <i class="fas fa-times-circle me-1"></i>Đang
                                                                     giao</span>
                                                             </c:when>
                                                             <c:when test="${order.status == 'DELIVERED'}">
-                                                                <span class="status-badge bg-success text-white">Đã
+                                                                <span class="status-badge bg-success text-white">
+                                                                    <i class="fas fa-times-circle me-1"></i>Đã
                                                                     giao</span>
+                                                            </c:when>
+                                                            <c:when test="${order.status == 'CANCELLED'}">
+                                                                <span class="status-badge bg-danger text-white">
+                                                                    <i class="fas fa-times-circle me-1"></i> Đã hủy
+                                                                </span>
                                                             </c:when>
                                                             <c:otherwise>
                                                                 <span
@@ -114,10 +122,9 @@
                                                         </c:choose>
                                                     </td>
                                                     <td>
-                                                        <a href="/order-detail/${order.id}"
-                                                            class="btn btn-outline-primary btn-sm px-3"
-                                                            style="border-radius: 20px;">
-                                                            <i class="fas fa-eye me-1"></i>Chi tiết
+                                                        <a href="/order-history/${order.id}"
+                                                            class="btn btn-sm btn-info text-white">
+                                                            <i class="fas fa-eye"></i> Chi tiết
                                                         </a>
                                                     </td>
                                                 </tr>

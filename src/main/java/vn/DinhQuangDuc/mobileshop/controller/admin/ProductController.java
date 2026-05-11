@@ -104,10 +104,17 @@ public class ProductController {
             currentProduct.setPrice(product.getPrice());
             currentProduct.setQuantity(product.getQuantity());
             currentProduct.setShortDesc(product.getShortDesc());
-            currentProduct.setDetailDesc(product.getDetailDesc());
             currentProduct.setFactory(product.getFactory());
             currentProduct.setTarget(product.getTarget());
-
+            currentProduct.setOs(product.getOs());
+            currentProduct.setRom(product.getRom());
+            currentProduct.setRam(product.getRam());
+            currentProduct.setRefreshRate(product.getRefreshRate());
+            currentProduct.setCpu(product.getCpu());
+            currentProduct.setScreenSize(product.getScreenSize());
+            currentProduct.setBattery(product.getBattery());
+            currentProduct.setFastCharge(product.getFastCharge());
+            currentProduct.setDetailDesc(product.getDetailDesc());
             this.productService.handleSaveProduct(currentProduct);
         }
 

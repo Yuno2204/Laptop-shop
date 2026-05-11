@@ -43,12 +43,32 @@
                                                     <li class="list-group-item">Tên sản phẩm: ${product.name}</li>
                                                     <li class="list-group-item">Giá: ${product.price}</li>
                                                     <li class="list-group-item">Số lượng: ${product.quantity}</li>
-                                                    <li class="list-group-item">Đã bán: ${product.sold}</li>
                                                     <li class="list-group-item">Thương hiệu: ${product.factory}</li>
                                                     <li class="list-group-item">Nhu cầu: ${product.target}</li>
+
+                                                    <li class="list-group-item">Hệ điều hành: ${product.os}</li>
+                                                    <li class="list-group-item">Chip xử lý: ${not empty product.cpu ?
+                                                        product.cpu : 'Đang cập nhật'}</li>
+                                                    <li class="list-group-item">RAM: ${product.ram}</li>
+                                                    <li class="list-group-item">Dung lượng ROM: ${product.rom}</li>
+                                                    <li class="list-group-item">Kích thước màn hình: ${not empty
+                                                        product.screenSize ? product.screenSize : 'Đang cập nhật'}</li>
+                                                    <li class="list-group-item">Tần số quét màn hình:
+                                                        ${product.refreshRate}</li>
+                                                    <li class="list-group-item">Dung lượng Pin: ${not empty
+                                                        product.battery ? product.battery : 'Đang cập nhật'}</li>
+                                                    <li class="list-group-item">Hỗ trợ sạc nhanh: ${not empty
+                                                        product.fastCharge ? product.fastCharge : 'Đang cập nhật'}</li>
+
                                                     <li class="list-group-item">Mô tả ngắn: ${product.shortDesc}</li>
-                                                    <li class="list-group-item">Mô tả chi tiết: ${product.detailDesc}
+                                                    <li class="list-group-item">
+                                                        Mô tả chi tiết:
+                                                        <div
+                                                            style="white-space: pre-line; color: #000; margin-top: 10px;">
+                                                            ${product.detailDesc}
+                                                        </div>
                                                     </li>
+                                                    <li class="list-group-item">Đã bán: ${product.sold}</li>
                                                     <li class="list-group-item">
                                                         Ảnh:
                                                         <br />

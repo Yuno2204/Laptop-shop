@@ -57,7 +57,7 @@
                                         </li>
 
                                         <li>
-                                            <a class="dropdown-item py-2" href="/profile">
+                                            <a class="dropdown-item py-2" href="/account">
                                                 <i class="fas fa-user-cog me-2 text-primary"></i> Quản lý tài khoản
                                             </a>
                                         </li>

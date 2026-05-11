@@ -36,6 +36,79 @@ public class Product {
     @NotBlank(message = "Thương hiệu không được để trống")
     private String factory;
     private String target;
+    private String os;
+    private String rom;
+    private String ram;
+    private String refreshRate;
+    private String cpu;
+    private String screenSize;
+    private String battery;
+    private String fastCharge;
+
+    // Getter và Setter (Bắt buộc phải có để Spring bind dữ liệu)
+    public String getCpu() {
+        return cpu;
+    }
+
+    public void setCpu(String cpu) {
+        this.cpu = cpu;
+    }
+
+    public String getScreenSize() {
+        return screenSize;
+    }
+
+    public void setScreenSize(String screenSize) {
+        this.screenSize = screenSize;
+    }
+
+    public String getBattery() {
+        return battery;
+    }
+
+    public void setBattery(String battery) {
+        this.battery = battery;
+    }
+
+    public String getFastCharge() {
+        return fastCharge;
+    }
+
+    public void setFastCharge(String fastCharge) {
+        this.fastCharge = fastCharge;
+    }
+
+    public String getOs() {
+        return os;
+    }
+
+    public void setOs(String os) {
+        this.os = os;
+    }
+
+    public String getRom() {
+        return rom;
+    }
+
+    public void setRom(String rom) {
+        this.rom = rom;
+    }
+
+    public String getRam() {
+        return ram;
+    }
+
+    public void setRam(String ram) {
+        this.ram = ram;
+    }
+
+    public String getRefreshRate() {
+        return refreshRate;
+    }
+
+    public void setRefreshRate(String refreshRate) {
+        this.refreshRate = refreshRate;
+    }
 
     public long getId() {
         return id;
@@ -121,7 +194,9 @@ public class Product {
     public String toString() {
         return "Product [id=" + id + ", name=" + name + ", price=" + price + ", image=" + image + ", detailDesc="
                 + detailDesc + ", shortDesc=" + shortDesc + ", quantity=" + quantity + ", sold=" + sold + ", factory="
-                + factory + ", target=" + target + "]";
+                + factory + ", target=" + target + ", os=" + os + ", rom=" + rom + ", ram=" + ram + ", refreshRate="
+                + refreshRate + ", cpu=" + cpu + ", screenSize=" + screenSize + ", battery=" + battery + ", fastCharge="
+                + fastCharge + "]";
     }
 
 }

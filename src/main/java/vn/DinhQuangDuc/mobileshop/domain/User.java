@@ -48,6 +48,25 @@ public class User {
     private String phone;
     private String avatar;
 
+    private String gender;
+    private String dateOfBirth;
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
     // user id
     // many user to one role
     @ManyToOne
@@ -142,9 +161,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", email=" + email + ", password=" + password + ", fullName=" + fullName
-                + ", address=" + address + ", phone=" + phone + ", avatar=" + avatar + ", role=" + role + ", orders="
-                + orders + ", cart=" + cart + "]";
+        return "User [id=" + id + ", email=" + email + ", password=" + password +
+                ", fullName=" + fullName + ", address=" + address +
+                ", phone=" + phone + ", avatar=" + avatar +
+                ", gender=" + gender + ", dateOfBirth=" + dateOfBirth + "]";
     }
 
 }

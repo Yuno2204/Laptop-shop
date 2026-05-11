@@ -11,7 +11,7 @@
                     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
                     <meta name="description" content="" />
                     <meta name="author" content="" />
-                    <title>Register - SB Admin</title>
+                    <title>Register</title>
                     <link href="css/styles.css" rel="stylesheet" />
                     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
                         crossorigin="anonymous"></script>
@@ -30,8 +30,12 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <form:form method="post" action="/register"
-                                                        modelAttribute="registerUser">
-                                                        <!-- First + Last Name -->
+                                                        modelAttribute="registerUser" enctype="multipart/form-data">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Ảnh đại diện (Avatar)</label>
+                                                            <input type="file" name="avatarFile" class="form-control"
+                                                                accept="image/png, image/jpeg" />
+                                                        </div>
                                                         <div class="row">
                                                             <div class="col-md-6 mb-3">
                                                                 <spring:bind path="registerUser.firstName">
@@ -76,7 +80,61 @@
                                                                 </c:if>
                                                             </spring:bind>
                                                         </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <spring:bind path="registerUser.address">
+                                                                    <label class="form-label">Địa chỉ</label>
+                                                                    <form:input path="address"
+                                                                        class="form-control ${status.error ? 'is-invalid' : ''}"
+                                                                        placeholder="Nhập địa chỉ cụ thể" />
+                                                                    <c:if test="${status.error}">
+                                                                        <div class="invalid-feedback d-block">
+                                                                            ${status.errorMessages[0]}</div>
+                                                                    </c:if>
+                                                                </spring:bind>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <spring:bind path="registerUser.phone">
+                                                                    <label class="form-label">Số điện thoại</label>
+                                                                    <form:input path="phone"
+                                                                        class="form-control ${status.error ? 'is-invalid' : ''}"
+                                                                        placeholder="Nhập số điện thoại" />
+                                                                    <c:if test="${status.error}">
+                                                                        <div class="invalid-feedback d-block">
+                                                                            ${status.errorMessages[0]}</div>
+                                                                    </c:if>
+                                                                </spring:bind>
+                                                            </div>
+                                                        </div>
 
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <spring:bind path="registerUser.gender">
+                                                                    <label class="form-label">Giới tính</label>
+                                                                    <form:select path="gender"
+                                                                        class="form-select ${status.error ? 'is-invalid' : ''}">
+                                                                        <form:option value="Nam">Nam</form:option>
+                                                                        <form:option value="Nữ">Nữ</form:option>
+                                                                        <form:option value="Khác">Khác</form:option>
+                                                                    </form:select>
+                                                                    <c:if test="${status.error}">
+                                                                        <div class="invalid-feedback d-block">
+                                                                            ${status.errorMessages[0]}</div>
+                                                                    </c:if>
+                                                                </spring:bind>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <spring:bind path="registerUser.dateOfBirth">
+                                                                    <label class="form-label">Ngày sinh</label>
+                                                                    <form:input type="date" path="dateOfBirth"
+                                                                        class="form-control ${status.error ? 'is-invalid' : ''}" />
+                                                                    <c:if test="${status.error}">
+                                                                        <div class="invalid-feedback d-block">
+                                                                            ${status.errorMessages[0]}</div>
+                                                                    </c:if>
+                                                                </spring:bind>
+                                                            </div>
+                                                        </div>
                                                         <!-- Password -->
                                                         <div class="row">
                                                             <div class="col-md-6 mb-3">

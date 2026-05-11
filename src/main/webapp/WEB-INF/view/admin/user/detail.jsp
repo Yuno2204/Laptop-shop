@@ -47,6 +47,8 @@
                           <li class="list-group-item">ID: ${user.id}</li>
                           <li class="list-group-item">Email: ${user.email}</li>
                           <li class="list-group-item">Họ và tên: ${user.fullName}</li>
+                          <li class="list-group-item">Giới tính: ${user.gender}</li>
+                          <li class="list-group-item">Ngày sinh: ${user.dateOfBirth}</li>
                           <li class="list-group-item">Số điện thoại: ${user.phone}</li>
                           <li class="list-group-item">Địa chỉ: ${user.address}</li>
                         </ul>

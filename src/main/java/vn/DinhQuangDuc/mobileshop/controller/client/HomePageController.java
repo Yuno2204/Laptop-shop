@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -18,6 +19,7 @@ import vn.DinhQuangDuc.mobileshop.domain.Product;
 import vn.DinhQuangDuc.mobileshop.domain.User;
 import vn.DinhQuangDuc.mobileshop.dto.RegisterDTO;
 import vn.DinhQuangDuc.mobileshop.service.ProductService;
+import vn.DinhQuangDuc.mobileshop.service.UploadService;
 import vn.DinhQuangDuc.mobileshop.service.UserService;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,11 +30,14 @@ public class HomePageController {
     private final ProductService productService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final UploadService uploadService;
 
-    public HomePageController(ProductService productService, UserService userService, PasswordEncoder passwordEncoder) {
+    public HomePageController(ProductService productService, UserService userService, PasswordEncoder passwordEncoder,
+            UploadService uploadService) {
         this.productService = productService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.uploadService = uploadService;
     }
 
     @GetMapping("/")
@@ -50,11 +55,20 @@ public class HomePageController {
 
     @PostMapping("/register")
     public String handleRegister(@ModelAttribute("registerUser") @Valid RegisterDTO registerDTO,
-            BindingResult bindingResult) {
+            BindingResult bindingResult,
+            @RequestParam("avatarFile") MultipartFile avatarFile) {
+
         if (bindingResult.hasErrors()) {
             return "client/auth/register";
         }
         User user = this.userService.registerDTOtoUser(registerDTO);
+        if (!avatarFile.isEmpty()) {
+            String avatarFilename = this.uploadService.handleSaveUploadFile(avatarFile, "avatar");
+            user.setAvatar(avatarFilename);
+        } else {
+            user.setAvatar("avatar.jpg");
+        }
+
         String hashPassword = this.passwordEncoder.encode(user.getPassword());
         user.setPassword(hashPassword);
         user.setRole(this.userService.getRoleByName("USER"));

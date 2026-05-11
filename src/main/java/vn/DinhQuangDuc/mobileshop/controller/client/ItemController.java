@@ -2,6 +2,7 @@ package vn.DinhQuangDuc.mobileshop.controller.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,16 +22,19 @@ import vn.DinhQuangDuc.mobileshop.domain.Product;
 import vn.DinhQuangDuc.mobileshop.domain.User;
 import vn.DinhQuangDuc.mobileshop.service.OrderService;
 import vn.DinhQuangDuc.mobileshop.service.ProductService;
+import vn.DinhQuangDuc.mobileshop.service.UserService;
 
 @Controller
 public class ItemController {
 
     private final ProductService productService;
     private final OrderService orderService;
+    private final UserService userService;
 
-    public ItemController(ProductService productService, OrderService orderService) {
+    public ItemController(ProductService productService, OrderService orderService, UserService userService) {
         this.productService = productService;
         this.orderService = orderService;
+        this.userService = userService;
     }
 
     @GetMapping("/product/{id}")
@@ -95,10 +99,16 @@ public class ItemController {
             return "redirect:/login";
         }
 
+        // Lấy ID từ session
         long userId = (long) session.getAttribute("id");
-        User currentUser = new User();
-        currentUser.setId(userId);
 
+        // Gọi userService lấy thông tin User (Đã hết lỗi vì đã inject ở Bước 1)
+        User currentUser = this.userService.getUserByID(userId);
+
+        // TRUYỀN DỮ LIỆU USER SANG TRANG CHECKOUT ĐỂ TỰ ĐỘNG ĐIỀN FORM
+        model.addAttribute("user", currentUser);
+
+        // Xử lý giỏ hàng và tổng tiền
         Cart cart = this.productService.fetchByUser(currentUser);
         List<CartDetail> cartDetails = cart == null ? new ArrayList<>() : cart.getCartDetails();
 
@@ -109,6 +119,7 @@ public class ItemController {
 
         model.addAttribute("cartDetails", cartDetails);
         model.addAttribute("totalPrice", totalPrice);
+
         return "client/cart/checkout";
     }
 
@@ -168,5 +179,82 @@ public class ItemController {
         model.addAttribute("orders", orders);
 
         return "client/cart/order-history";
+    }
+
+    @GetMapping("/order-history/{id}")
+    public String getOrderDetailPage(Model model, HttpServletRequest request, @PathVariable long id) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null)
+            return "redirect:/login";
+        long userId = (long) session.getAttribute("id");
+
+        Optional<Order> orderOpt = this.orderService.fetchOrderById(id);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            // Bảo mật: Chỉ cho phép xem đơn hàng của chính mình
+            if (order.getUser().getId() != userId) {
+                return "redirect:/order-history";
+            }
+            model.addAttribute("order", order);
+            return "client/cart/order-detail";
+        }
+        return "redirect:/order-history";
+    }
+
+    // 2. Xử lý cập nhật thông tin nhận hàng
+    @PostMapping("/order-history/update")
+    public String updateOrderInfo(HttpServletRequest request,
+            @RequestParam("orderId") long orderId,
+            @RequestParam("receiverName") String receiverName,
+            @RequestParam("receiverAddress") String receiverAddress,
+            @RequestParam("receiverPhone") String receiverPhone,
+            RedirectAttributes ra) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null)
+            return "redirect:/login";
+        long userId = (long) session.getAttribute("id");
+
+        Optional<Order> orderOpt = this.orderService.fetchOrderById(orderId);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            // Kểm tra điều kiện: Đúng chủ đơn hàng VÀ trạng thái phải là PENDING
+            if (order.getUser().getId() == userId && "PENDING".equals(order.getStatus())) {
+                order.setReceiverName(receiverName);
+                order.setReceiverAddress(receiverAddress);
+                order.setReceiverPhone(receiverPhone);
+                this.orderService.saveOrder(order); // Lưu thay đổi
+                ra.addFlashAttribute("success", "Cập nhật thông tin nhận hàng thành công!");
+            } else {
+                ra.addFlashAttribute("error", "Đơn hàng đang giao, không thể cập nhật!");
+            }
+        }
+        return "redirect:/order-history/" + orderId;
+    }
+
+    // 3. Xử lý Hủy đơn hàng
+    @PostMapping("/order-history/cancel")
+    public String cancelOrder(HttpServletRequest request, @RequestParam("orderId") long orderId,
+            RedirectAttributes ra) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null)
+            return "redirect:/login";
+        long userId = (long) session.getAttribute("id");
+
+        Optional<Order> orderOpt = this.orderService.fetchOrderById(orderId);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            if (order.getUser().getId() == userId && "PENDING".equals(order.getStatus())) {
+                // Tái sử dụng logic updateOrder của Admin (tự động hoàn kho)
+                Order tempOrder = new Order();
+                tempOrder.setId(orderId);
+                tempOrder.setStatus("CANCELLED");
+                this.orderService.updateOrder(tempOrder);
+
+                ra.addFlashAttribute("success", "Hủy đơn hàng thành công! Số lượng sản phẩm đã được hoàn lại kho.");
+            } else {
+                ra.addFlashAttribute("error", "Không thể hủy đơn hàng lúc này!");
+            }
+        }
+        return "redirect:/order-history/" + orderId;
     }
 }

@@ -90,15 +90,17 @@ public class UserController {
 
     @PostMapping("/admin/user/update")
     public String postUpdateUserPage(Model model, @ModelAttribute("newUser") User cen) {
-        User crrentUser = this.userService.getUserByID(cen.getId());
-        if (crrentUser != null) {
+        User currentUser = this.userService.getUserByID(cen.getId());
+        if (currentUser != null) {
             System.out.println("run here");
-            crrentUser.setAddress(cen.getAddress());
-            crrentUser.setFullName(cen.getFullName());
-            crrentUser.setPhone(cen.getPhone());
-            this.userService.handleSaveUser(crrentUser);
+            currentUser.setAddress(cen.getAddress());
+            currentUser.setFullName(cen.getFullName());
+            currentUser.setPhone(cen.getPhone());
+            currentUser.setGender(cen.getGender());
+            currentUser.setDateOfBirth(cen.getDateOfBirth());
+            this.userService.handleSaveUser(currentUser);
         }
-        model.addAttribute("newUser", crrentUser);
+        model.addAttribute("newUser", currentUser);
         return "redirect:/admin/user";
     }
 

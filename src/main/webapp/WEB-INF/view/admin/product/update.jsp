@@ -86,7 +86,7 @@
 
                                                 <!-- SHORT DESC -->
                                                 <div class="mb-3 col-12 col-md-6">
-                                                    <label class="form-label">Mô tả:</label>
+                                                    <label class="form-label">Mô tả ngắn:</label>
 
                                                     <spring:bind path="newProduct.shortDesc">
                                                         <form:input path="shortDesc"
@@ -102,12 +102,10 @@
 
                                                 <!-- DETAIL DESC -->
                                                 <div class="mb-3 col-12">
-                                                    <label class="form-label">Chi tiết:</label>
-
+                                                    <label for="detailDesc" class="form-label">Mô tả chi tiết:</label>
                                                     <spring:bind path="newProduct.detailDesc">
-                                                        <form:textarea path="detailDesc"
+                                                        <form:textarea path="detailDesc" id="detailDesc" rows="10"
                                                             class="form-control ${status.error ? 'is-invalid' : ''}" />
-
                                                         <c:if test="${status.error}">
                                                             <div class="invalid-feedback d-block">
                                                                 ${status.errorMessages[0]}
@@ -115,33 +113,130 @@
                                                         </c:if>
                                                     </spring:bind>
                                                 </div>
+                                                <div class="row">
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label for="cpu" class="form-label">Chip xử lý:</label>
+                                                        <spring:bind path="newProduct.cpu">
+                                                            <form:input path="cpu" id="cpu" type="text"
+                                                                placeholder="Apple A18 Pro"
+                                                                class="form-control ${status.error ? 'is-invalid' : ''}" />
+                                                            <c:if test="${status.error}">
+                                                                <div class="invalid-feedback d-block">
+                                                                    ${status.errorMessages[0]}
+                                                                </div>
+                                                            </c:if>
+                                                        </spring:bind>
+                                                    </div>
+
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label for="screenSize" class="form-label">Kích thước màn
+                                                            hình:</label>
+                                                        <spring:bind path="newProduct.screenSize">
+                                                            <form:input path="screenSize" id="screenSize" type="text"
+                                                                placeholder="6.7 inch"
+                                                                class="form-control ${status.error ? 'is-invalid' : ''}" />
+                                                            <c:if test="${status.error}">
+                                                                <div class="invalid-feedback d-block">
+                                                                    ${status.errorMessages[0]}
+                                                                </div>
+                                                            </c:if>
+                                                        </spring:bind>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label for="battery" class="form-label">Dung lượng
+                                                            Pin:</label>
+                                                        <spring:bind path="newProduct.battery">
+                                                            <form:input path="battery" id="battery" type="text"
+                                                                placeholder="5000 mAh"
+                                                                class="form-control ${status.error ? 'is-invalid' : ''}" />
+                                                            <c:if test="${status.error}">
+                                                                <div class="invalid-feedback d-block">
+                                                                    ${status.errorMessages[0]}
+                                                                </div>
+                                                            </c:if>
+                                                        </spring:bind>
+                                                    </div>
+
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label for="fastCharge" class="form-label">Sạc nhanh
+                                                            (W):</label>
+                                                        <spring:bind path="newProduct.fastCharge">
+                                                            <form:input path="fastCharge" id="fastCharge" type="text"
+                                                                placeholder="25W"
+                                                                class="form-control ${status.error ? 'is-invalid' : ''}" />
+                                                            <c:if test="${status.error}">
+                                                                <div class="invalid-feedback d-block">
+                                                                    ${status.errorMessages[0]}
+                                                                </div>
+                                                            </c:if>
+                                                        </spring:bind>
+                                                    </div>
+                                                </div>
 
                                                 <!-- FACTORY -->
-                                                <div class="mb-3 col-12 col-md-6">
-                                                    <label class="form-label">Thương hiệu:</label>
+                                                <div class="row">
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label class="form-label">Hệ điều hành:</label>
+                                                        <form:select class="form-select" path="os">
+                                                            <form:option value="iOS">iOS</form:option>
+                                                            <form:option value="Android">Android</form:option>
+                                                        </form:select>
+                                                    </div>
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label class="form-label">Thương hiệu:</label>
+                                                        <form:select class="form-select" path="factory">
+                                                            <form:option value="Apple">Apple</form:option>
+                                                            <form:option value="Samsung">Samsung</form:option>
+                                                            <form:option value="Xiaomi">Xiaomi</form:option>
+                                                            <form:option value="Oppo">Oppo</form:option>
+                                                            <form:option value="Vivo">Vivo</form:option>
+                                                            <form:option value="Nokia">Nokia</form:option>
+                                                        </form:select>
+                                                    </div>
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label class="form-label">Dung lượng ROM:</label>
+                                                        <form:select class="form-select" path="rom">
+                                                            <form:option value="≤128 GB">≤128 GB</form:option>
+                                                            <form:option value="256 GB">256 GB</form:option>
+                                                            <form:option value="512 GB">512 GB</form:option>
+                                                            <form:option value="1 TB">1 TB</form:option>
+                                                        </form:select>
+                                                    </div>
 
-                                                    <form:select path="factory" class="form-select">
-                                                        <form:option value="Apple">Apple</form:option>
-                                                        <form:option value="Samsung">Samsung</form:option>
-                                                        <form:option value="Xiaomi">Xiaomi</form:option>
-                                                        <form:option value="Oppo">Oppo</form:option>
-                                                        <form:option value="Vivo">Vivo</form:option>
-                                                        <form:option value="Nokia">Nokia</form:option>
-                                                    </form:select>
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label class="form-label">RAM:</label>
+                                                        <form:select class="form-select" path="ram">
+                                                            <form:option value="4 GB">4 GB</form:option>
+                                                            <form:option value="6 GB">6 GB</form:option>
+                                                            <form:option value="8 GB">8 GB</form:option>
+                                                            <form:option value="12 GB">12 GB</form:option>
+                                                        </form:select>
+                                                    </div>
+
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label class="form-label">Tần số quét:</label>
+                                                        <form:select class="form-select" path="refreshRate">
+                                                            <form:option value="60 Hz">60 Hz</form:option>
+                                                            <form:option value="90 Hz">90 Hz</form:option>
+                                                            <form:option value="120 Hz">120 Hz</form:option>
+                                                            <form:option value="Trên 144 Hz">Trên 144 Hz
+                                                            </form:option>
+                                                        </form:select>
+                                                    </div>
+                                                    <div class="mb-3 col-12 col-md-6">
+                                                        <label class="form-label">Nhu cầu:</label>
+
+                                                        <form:select path="target" class="form-select">
+                                                            <form:option value="Chơi game">Chơi game</form:option>
+                                                            <form:option value="Cấu hình cao">Cấu hình cao</form:option>
+                                                            <form:option value="Pin trâu">Pin trâu</form:option>
+                                                            <form:option value="Chụp ảnh đẹp">Chụp ảnh đẹp</form:option>
+                                                        </form:select>
+                                                    </div>
                                                 </div>
-
-                                                <!-- TARGET -->
-                                                <div class="mb-3 col-12 col-md-6">
-                                                    <label class="form-label">Nhu cầu:</label>
-
-                                                    <form:select path="target" class="form-select">
-                                                        <form:option value="Chơi game">Chơi game</form:option>
-                                                        <form:option value="Cấu hình cao">Cấu hình cao</form:option>
-                                                        <form:option value="Pin trâu">Pin trâu</form:option>
-                                                        <form:option value="Chụp ảnh đẹp">Chụp ảnh đẹp</form:option>
-                                                    </form:select>
-                                                </div>
-
                                                 <!-- IMAGE -->
                                                 <div class="mb-3 col-12">
                                                     <label class="form-label">Ảnh sản phẩm:</label>

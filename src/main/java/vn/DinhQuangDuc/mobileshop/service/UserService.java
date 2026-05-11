@@ -2,6 +2,7 @@ package vn.DinhQuangDuc.mobileshop.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vn.DinhQuangDuc.mobileshop.domain.Role;
@@ -11,6 +12,7 @@ import vn.DinhQuangDuc.mobileshop.repository.OrderRepository;
 import vn.DinhQuangDuc.mobileshop.repository.ProductRepository;
 import vn.DinhQuangDuc.mobileshop.repository.RoleRepository;
 import vn.DinhQuangDuc.mobileshop.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserService {
@@ -41,7 +43,7 @@ public class UserService {
 
     public User handleSaveUser(User user) {
         User cen = this.userRepository.save(user);
-        System.out.println(cen);
+        // System.out.println(cen);
         return cen;
     }
 
@@ -59,9 +61,13 @@ public class UserService {
 
     public User registerDTOtoUser(RegisterDTO registerDTO) {
         User user = new User();
-        user.setFullName(registerDTO.getFirstName() + "" + registerDTO.getLastName());
+        user.setFullName(registerDTO.getFirstName() + " " + registerDTO.getLastName());
         user.setEmail(registerDTO.getEmail());
         user.setPassword(registerDTO.getPassword());
+        user.setAddress(registerDTO.getAddress());
+        user.setPhone(registerDTO.getPhone());
+        user.setGender(registerDTO.getGender());
+        user.setDateOfBirth(registerDTO.getDateOfBirth());
         return user;
     }
 
@@ -83,5 +89,26 @@ public class UserService {
 
     public long countOrders() {
         return this.orderRepository.count();
+    }
+
+    public void updateUserProfile(User user) {
+        User currentUser = this.getUserByID(user.getId());
+        if (currentUser != null) {
+            currentUser.setFullName(user.getFullName());
+            currentUser.setPhone(user.getPhone());
+            currentUser.setAddress(user.getAddress());
+            currentUser.setGender(user.getGender());
+            currentUser.setDateOfBirth(user.getDateOfBirth());
+            this.userRepository.save(currentUser);
+        }
+    }
+
+    public boolean checkOldPassword(User user, String oldPassword, PasswordEncoder passwordEncoder) {
+        return passwordEncoder.matches(oldPassword, user.getPassword());
+    }
+
+    public void changePassword(User user, String newPassword, PasswordEncoder passwordEncoder) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        this.userRepository.save(user);
     }
 }
