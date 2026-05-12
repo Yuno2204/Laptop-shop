@@ -2,6 +2,8 @@ package vn.DinhQuangDuc.mobileshop.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +34,7 @@ public class User {
     @NotBlank(message = "Mật khẩu không được để trống")
     // @Size(min = 6, max = 100, message = "Mật khẩu phải từ 6 đến 100 ký tự")
     @StrongPassword(message = "Phai co 8 ki tu")
+    @JsonIgnore
     private String password;
 
     // @NotBlank(message = "Họ và tên không được để trống")
@@ -74,9 +77,11 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Order> orders;
 
     @OneToOne(mappedBy = "user")
+    @JsonIgnore
     private Cart cart;
 
     public Role getRole() {

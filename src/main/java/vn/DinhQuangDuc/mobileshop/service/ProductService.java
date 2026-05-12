@@ -1,7 +1,9 @@
 package vn.DinhQuangDuc.mobileshop.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import vn.DinhQuangDuc.mobileshop.domain.Order;
 import vn.DinhQuangDuc.mobileshop.domain.OrderDetail;
 import vn.DinhQuangDuc.mobileshop.domain.Product;
 import vn.DinhQuangDuc.mobileshop.domain.User;
+import vn.DinhQuangDuc.mobileshop.dto.ProductSearchDTO;
 import vn.DinhQuangDuc.mobileshop.repository.CartDetailRepository;
 import vn.DinhQuangDuc.mobileshop.repository.CartRepository;
 import vn.DinhQuangDuc.mobileshop.repository.OrderDetailRepository;
@@ -42,7 +45,7 @@ public class ProductService {
         return this.productRepository.save(product);
     }
 
-    public List<Product> ferchProducts() {
+    public List<Product> fetchProducts() {
         return this.productRepository.findAll();
     }
 
@@ -166,6 +169,7 @@ public class ProductService {
                     totalPrice += (cd.getPrice() * cd.getQuantity());
                 }
                 order.setTotalPrice(totalPrice);
+                order.setOrderDate(LocalDateTime.now());
 
                 // Bước 2: Lưu Order trước để lấy ID
                 order = this.orderRepository.save(order);
@@ -178,6 +182,7 @@ public class ProductService {
                     orderDetail.setPrice((long) cd.getPrice());
                     orderDetail.setQuantity(cd.getQuantity());
                     this.orderDetailRepository.save(orderDetail);
+                    this.orderRepository.save(order);
 
                     // ================= BƯỚC BỔ SUNG: TRỪ TỒN KHO =================
                     Product product = cd.getProduct();
@@ -196,5 +201,23 @@ public class ProductService {
             }
         }
         return null; // Trả về null nghĩa là đặt hàng thành công
+    }
+
+    public List<Product> searchProduct(String keyword) {
+        return productRepository.searchByKeyword(keyword);
+    }
+
+    // Lấy danh sách toàn bộ sản phẩm
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
+    public List<ProductSearchDTO> searchProductAjax(String keyword) {
+        List<Product> products = keyword.isEmpty() ? productRepository.findAll()
+                : productRepository.searchByKeyword(keyword);
+        return products.stream().map(p -> new ProductSearchDTO(
+                p.getId(), p.getName(), p.getPrice(), p.getQuantity(),
+                p.getFactory() // Truyền thêm factory
+        )).collect(Collectors.toList());
     }
 }

@@ -1,6 +1,7 @@
 package vn.DinhQuangDuc.mobileshop.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import vn.DinhQuangDuc.mobileshop.domain.Role;
 import vn.DinhQuangDuc.mobileshop.domain.User;
 import vn.DinhQuangDuc.mobileshop.dto.RegisterDTO;
+import vn.DinhQuangDuc.mobileshop.dto.UserSearchDTO;
 import vn.DinhQuangDuc.mobileshop.repository.OrderRepository;
 import vn.DinhQuangDuc.mobileshop.repository.ProductRepository;
 import vn.DinhQuangDuc.mobileshop.repository.RoleRepository;
@@ -110,5 +112,17 @@ public class UserService {
     public void changePassword(User user, String newPassword, PasswordEncoder passwordEncoder) {
         user.setPassword(passwordEncoder.encode(newPassword));
         this.userRepository.save(user);
+    }
+
+    public List<User> searchUser(String keyword) {
+        return userRepository.searchByKeyword(keyword);
+    }
+
+    public List<UserSearchDTO> searchUserAjax(String keyword) {
+        List<User> users = keyword.isEmpty() ? userRepository.findAll() : userRepository.searchByKeyword(keyword);
+        return users.stream().map(u -> new UserSearchDTO(
+                u.getId(), u.getEmail(), u.getFullName(),
+                u.getPhone(), // Truyền thêm phone
+                u.getRole() != null ? u.getRole().getName() : "USER")).collect(Collectors.toList());
     }
 }

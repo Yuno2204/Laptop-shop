@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -256,5 +257,12 @@ public class ItemController {
             }
         }
         return "redirect:/order-history/" + orderId;
+    }
+
+    @GetMapping("/api/order/status/{id}")
+    @ResponseBody
+    public Order getOrderStatus(@PathVariable Long id) {
+        // Trả về đối tượng Order dưới dạng JSON
+        return this.orderService.fetchOrderById(id).orElse(null);
     }
 }

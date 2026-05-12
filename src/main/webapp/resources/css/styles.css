@@ -11247,3 +11247,102 @@ body {
 .transition-all:hover {
     transform: translateY(-3px);
 }
+/* UI Thanh tìm kiếm hiện đại */
+.search-box-modern {
+    position: relative;
+    max-width: 450px;
+    margin-bottom: 25px;
+}
+.search-box-modern input {
+    width: 100%;
+    padding: 12px 40px 12px 45px;
+    border-radius: 30px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    font-size: 15px;
+}
+.search-box-modern input:focus {
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.25);
+    border-color: #80bdff;
+    outline: none;
+}
+.search-box-modern .search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 16px;
+}
+.search-box-modern .spinner-border {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.2rem;
+    height: 1.2rem;
+    display: none; /* Ẩn loading mặc định */
+}
+/* UI Empty State khi không có dữ liệu */
+.empty-state-modern {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+.empty-state-modern i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 15px;
+}
+.empty-state-modern p {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+/* Hiệu ứng cập nhật bảng mượt mà */
+.table-fade-in {
+    animation: fadeInTable 0.5s ease-in-out;
+}
+@keyframes fadeInTable {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Đảm bảo khoảng cách giữa Search Box và Button */
+.gap-3 {
+    gap: 1rem !important;
+}
+
+/* Loại bỏ margin bottom mặc định của search box khi nằm trong flex row */
+.search-box-modern.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+/* Responsive cho mobile: Tự động xuống hàng nếu màn hình quá hẹp */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+    
+    .d-flex.align-items-center.gap-3 {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 15px;
+    }
+    
+    .search-box-modern {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    
+    .btn-primary {
+        width: 100%;
+    }
+}
+
+/* Style cho Badge bo góc sâu hơn */
+.badge.rounded-pill {
+    padding: 0.5em 1em;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}

@@ -37,8 +37,30 @@
                                             <div class="clo-12 mx-auto">
                                                 <div class="d-flex justify-content-between">
                                                     <h3>Danh sách sản phẩm</h3>
-                                                    <a href="/admin/product/create" class="btn btn-primary">
-                                                        Thêm sản phẩm</a>
+                                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                                        <div>
+                                                        </div>
+
+                                                        <div class="d-flex align-items-center gap-3">
+                                                            <div class="search-box-modern mb-0" style="width: 350px;">
+                                                                <i class="fas fa-search search-icon"></i>
+                                                                <input type="text" id="searchInput" data-type="product"
+                                                                    placeholder="Tìm kiếm sản phẩm..."
+                                                                    autocomplete="off">
+                                                                <div class="spinner-border text-primary"
+                                                                    id="searchSpinner" role="status"></div>
+                                                            </div>
+
+                                                            <a href="/admin/product/create"
+                                                                class="btn btn-primary px-4">
+                                                                <i class="fas fa-plus me-2"></i>Thêm mới
+                                                            </a>
+                                                            <a href="/admin/product/export"
+                                                                class="btn btn-success shadow-sm">
+                                                                <i class="fas fa-file-excel me-2"></i> Xuất Excel
+                                                            </a>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <hr />
                                                 <table class="table table-bordered table-hover">
@@ -52,7 +74,7 @@
                                                             <th>Chức năng</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
+                                                    <tbody id="tableBody">
                                                         <c:forEach var="product" items="${products}">
                                                             <tr>
                                                                 <th>${product.id}</th>

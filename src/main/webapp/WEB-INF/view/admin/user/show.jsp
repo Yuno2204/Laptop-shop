@@ -33,8 +33,26 @@
                     <div class="clo-12 mx-auto">
                       <div class="d-flex justify-content-between">
                         <h3>Danh sách người dùng</h3>
-                        <a href="/admin/user/create" class="btn btn-primary">
-                          Thêm người dùng</a>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                          <div>
+                          </div>
+
+                          <div class="d-flex align-items-center gap-3">
+                            <div class="search-box-modern mb-0" style="width: 350px;">
+                              <i class="fas fa-search search-icon"></i>
+                              <input type="text" id="searchInput" data-type="user" placeholder="Tìm kiếm người dùng..."
+                                autocomplete="off">
+                              <div class="spinner-border text-primary" id="searchSpinner" role="status"></div>
+                            </div>
+
+                            <a href="/admin/user/create" class="btn btn-primary px-4">
+                              <i class="fas fa-plus me-2"></i>Thêm mới
+                            </a>
+                            <a href="/admin/user/export" class="btn btn-success shadow-sm">
+                              <i class="fas fa-file-excel me-2"></i> Xuất Excel
+                            </a>
+                          </div>
+                        </div>
                       </div>
                       <hr />
                       <table class="table table-bordered table-hover">
@@ -48,14 +66,23 @@
                             <th>Chúc năng</th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tableBody">
                           <c:forEach var="user" items="${users1}">
                             <tr>
                               <th>${user.id}</th>
                               <td>${user.email}</td>
                               <td>${user.fullName}</td>
                               <td>${user.phone}</td>
-                              <td>${user.role.name}</td>
+                              <td>
+                                <c:choose>
+                                  <c:when test="${user.role.name == 'ADMIN'}">
+                                    <span class="badge bg-primary">${user.role.name}</span>
+                                  </c:when>
+                                  <c:otherwise>
+                                    <span class="badge bg-info text-dark">${user.role.name}</span>
+                                  </c:otherwise>
+                                </c:choose>
+                              </td>
                               <td>
                                 <a href="/admin/user/${user.id}" class="btn btn-success">Xem chi tiết</a>
                                 <a href="/admin/user/update/${user.id}" class="btn btn-warning mx-2">Cập nhật</a>

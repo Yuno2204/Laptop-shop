@@ -2,6 +2,7 @@ package vn.DinhQuangDuc.mobileshop.controller.admin;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,10 +13,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import vn.DinhQuangDuc.mobileshop.domain.User;
+import vn.DinhQuangDuc.mobileshop.dto.UserSearchDTO;
+import vn.DinhQuangDuc.mobileshop.service.ExcelExportService;
 import vn.DinhQuangDuc.mobileshop.service.UploadService;
 import vn.DinhQuangDuc.mobileshop.service.UserService;
 
@@ -24,20 +29,15 @@ public class UserController {
     private final UserService userService;
     private final UploadService uploadService;
     private final PasswordEncoder passwordEncoder;
+    private final ExcelExportService excelExportService;
 
     public UserController(UserService userService, UploadService uploadService,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder, ExcelExportService excelExportService) {
         this.userService = userService;
         this.uploadService = uploadService;
         this.passwordEncoder = passwordEncoder;
+        this.excelExportService = excelExportService;
     }
-
-    // @GetMapping("/")
-    // public String getHomePage(Model model) {
-    // model.addAttribute("cen", "test");
-    // model.addAttribute("cenlove", "from controller with model");
-    // return "hello";
-    // }
 
     @GetMapping("/admin/user")
     public String getUserPage(Model model) {
@@ -117,4 +117,23 @@ public class UserController {
         return "redirect:/admin/user";
     }
 
+    @GetMapping("/admin/user/search")
+    @ResponseBody // Bắt buộc để trả về JSON
+    public ResponseEntity<List<UserSearchDTO>> searchUser(@RequestParam(defaultValue = "") String keyword) {
+        // Gọi hàm search từ Service (hàm đã map sang DTO ở bước trước)
+        List<UserSearchDTO> users = userService.searchUserAjax(keyword);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/admin/user/export")
+    public void exportUsersToExcel(HttpServletResponse response) {
+        try {
+            // Lấy toàn bộ danh sách người dùng từ database
+            List<User> users = this.userService.getAllUsers();
+            // Gọi service để xuất file
+            this.excelExportService.exportUsers(response, users);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

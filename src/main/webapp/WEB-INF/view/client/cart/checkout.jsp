@@ -154,8 +154,7 @@
                                         <div class="col-12 col-md-5 ms-auto">
                                             <div class="bg-light rounded">
                                                 <div class="p-4">
-                                                    <h1 class="display-6 mb-4">Thông Tin <span class="fw-normal">Thanh
-                                                            Toán</span></h1>
+                                                    <h1 class="display-6 mb-4">Thông Tin Đơn Hàng</h1>
 
                                                     <!-- Danh sách sản phẩm -->
                                                     <c:forEach var="cartDetail" items="${cartDetails}">
@@ -200,7 +199,7 @@
                                                 <button
                                                     class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4"
                                                     type="submit">
-                                                    Xác nhận thanh toán
+                                                    Xác nhận đặt hàng
                                                 </button>
                                             </div>
                                         </div>

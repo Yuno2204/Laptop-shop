@@ -42,7 +42,7 @@ public class HomePageController {
 
     @GetMapping("/")
     public String getMethodName(Model model) {
-        List<Product> products = this.productService.ferchProducts();
+        List<Product> products = this.productService.fetchProducts();
         model.addAttribute("products", products);
         return "client/homepage/show";
     }
