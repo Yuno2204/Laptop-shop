@@ -36,9 +36,39 @@ public class OrderController {
 
     // Hiển thị danh sách đơn hàng
     @GetMapping("/admin/order")
-    public String getDashboard(Model model) {
-        List<Order> orders = this.orderService.fetchAllOrders();
-        model.addAttribute("orders", orders);
+    public String getDashboard(Model model,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate) {
+
+        List<Order> orders;
+
+        // 1. Nếu có lọc theo ngày (Vẫn ưu tiên kết quả từ Service - Service này nên trả
+        // về đơn DELIVERED)
+        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+            LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
+            LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
+            orders = this.orderService.getRevenueByDate(start, end);
+        }
+        // 2. MẶC ĐỊNH: Chỉ lấy đơn hàng có trạng thái DELIVERED
+        else {
+            List<Order> allOrders = this.orderService.fetchAllOrders();
+            orders = allOrders.stream()
+                    .filter(o -> "DELIVERED".equals(o.getStatus()))
+                    .collect(Collectors.toList());
+        }
+
+        // Sắp xếp đơn mới nhất lên đầu
+        orders.sort((o1, o2) -> Long.compare(o2.getId(), o1.getId()));
+
+        double totalRevenue = orders.stream()
+                .mapToDouble(Order::getTotalPrice)
+                .sum();
+
+        model.addAttribute("orders", orders); // Đặt tên là orders để khớp với JSP bên dưới
+        model.addAttribute("totalRevenue", totalRevenue);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
         return "admin/order/show";
     }
 
@@ -99,7 +129,7 @@ public class OrderController {
     public ResponseEntity<?> filterRevenue(@RequestParam String startDate, @RequestParam String endDate) {
         LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
         LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         List<OrderSearchDTO> revenueData = orderService.getRevenueByDate(start, end)
                 .stream().map(o -> new OrderSearchDTO(
@@ -122,7 +152,8 @@ public class OrderController {
             throws Exception {
         LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
         LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
-        orderService.exportRevenueToExcel(response, start, end);
+        List<Order> revenueOrders = orderService.getRevenueByDate(start, end);
+        excelExportService.exportRevenue(response, revenueOrders, start, end);
     }
 
     @GetMapping("/admin/order/export")

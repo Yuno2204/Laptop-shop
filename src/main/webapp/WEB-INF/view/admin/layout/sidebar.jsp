@@ -1,35 +1,52 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core"%> <%@taglib
-uri="http://www.springframework.org/tags/form" prefix="form"%>
-<div id="layoutSidenav_nav">
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+        <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
-                    <div class="nav">
-                        <div class="sb-sidenav-menu-heading">Features</div>
+                    <div class="nav pt-3">
+
+                        <div class="sb-sidenav-menu-heading">Hệ thống</div>
                         <a class="nav-link" href="/admin">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
 
+                        <div class="sb-sidenav-menu-heading">Quản lý</div>
+
                         <a class="nav-link" href="/admin/user">
-                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                            User
+                            <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                            Người dùng
                         </a>
 
                         <a class="nav-link" href="/admin/product">
-                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                            Product
+                            <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
                         </a>
 
                         <a class="nav-link" href="/admin/order">
-                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                            Order
+                            <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
+                            Đơn hàng
                         </a>
+
                     </div>
                 </div>
+
                 <div class="sb-sidenav-footer">
-                    <div class="small">Logged in as:</div>
-                    Đinh Quang Đức
+                    <div class="small">Đang đăng nhập:</div>
+                    <i class="fas fa-circle text-success me-1" style="font-size: 10px;"></i>
+                    ${not empty sessionScope.fullName ? sessionScope.fullName : "Chưa đăng nhập"}
                 </div>
             </nav>
         </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const path = window.location.pathname;
+                document.querySelectorAll('.sb-sidenav .nav-link').forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (path === href || (href !== '/admin' && path.startsWith(href))) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        </script>

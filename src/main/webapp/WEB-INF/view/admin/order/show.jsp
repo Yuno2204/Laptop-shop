@@ -145,7 +145,7 @@
                                     <div class="tab-pane fade" id="revenue" role="tabpanel">
                                         <div class="card shadow-sm border-0">
                                             <div class="card-header bg-white py-3">
-                                                <h5 class="mb-0">Thống kê doanh thu (Đơn hàng thành công)</h5>
+                                                <h5 class="mb-0">Thống kê doanh thu</h5>
                                             </div>
                                             <div class="card-body">
                                                 <div class="row g-3 mb-4">
@@ -185,14 +185,16 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody id="revenueTableBody">
-                                                            <c:forEach items="${revenueOrders}" var="order">
+                                                            <c:forEach items="${orders}" var="order">
                                                                 <tr>
-                                                                    <td class="text-center">${order.id}</td>
+                                                                    <td class="text-center fw-bold">#${order.id}</td>
                                                                     <td>${order.receiverName}</td>
-                                                                    <td>${order.receiverPhone}</td>
-                                                                    <td class="text-center">${order.orderDate}</td>
-                                                                    <td class="text-center">${order.deliveredDate}</td>
-                                                                    <td class="text-end fw-bold">
+                                                                    <td class="text-center">${order.receiverPhone}</td>
+                                                                    <td class="text-center">${order.formattedOrderDate}
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        ${order.formattedDeliveredDate}</td>
+                                                                    <td class="text-end fw-bold text-danger">
                                                                         <fmt:formatNumber value="${order.totalPrice}"
                                                                             type="number" /> đ
                                                                     </td>
@@ -201,11 +203,14 @@
                                                                     </td>
                                                                 </tr>
                                                             </c:forEach>
-                                                            <c:if test="${empty revenueOrders}">
+
+                                                            <c:if test="${empty orders}">
                                                                 <tr>
-                                                                    <td colspan="7" class="text-center py-4 text-muted">
-                                                                        Không có dữ liệu doanh thu trong khoảng thời
-                                                                        gian này.
+                                                                    <td colspan="7" class="text-center py-5 text-muted">
+                                                                        <i
+                                                                            class="fas fa-box-open fa-3x mb-3 text-light"></i><br>
+                                                                        Không có dữ liệu doanh thu (đơn hàng DELIVERED)
+                                                                        trong hệ thống.
                                                                     </td>
                                                                 </tr>
                                                             </c:if>
