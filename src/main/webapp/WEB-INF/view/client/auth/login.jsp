@@ -78,9 +78,7 @@
                                                 </div>
 
                                                 <!-- BUTTON -->
-                                                <div
-                                                    class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                                                    <a class="small" href="/forgot-password">Quên mật khẩu?</a>
+                                                <div class="d-flex justify-content-center align-items-center mt-4 mb-0">
                                                     <button class="btn btn-primary" type="submit">
                                                         Đăng nhập
                                                     </button>

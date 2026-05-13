@@ -26,10 +26,7 @@
                                 class="btn btn-primary px-5 py-3 rounded-pill text-white shadow fw-bold transition-all">
                                 <i class="fas fa-shopping-cart me-2"></i> Mua Sắm Ngay
                             </a>
-                            <a href="/contact"
-                                class="btn btn-outline-secondary px-5 py-3 rounded-pill shadow-sm fw-bold transition-all">
-                                Liên Hệ
-                            </a>
+
                         </div>
                     </div>
 
