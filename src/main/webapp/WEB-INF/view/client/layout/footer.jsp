@@ -17,16 +17,14 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="d-flex flex-column text-start footer-item">
                             <h4 class="text-light mb-4">Chính Sách</h4>
-                            <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all" href="#"><i
-                                    class="fas fa-angle-right me-2"></i>Chính sách bảo hành</a>
-                            <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all" href="#"><i
-                                    class="fas fa-angle-right me-2"></i>Chính sách đổi trả</a>
-                            <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all" href="#"><i
-                                    class="fas fa-angle-right me-2"></i>Chính sách bảo mật</a>
-                            <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all" href="#"><i
-                                    class="fas fa-angle-right me-2"></i>Điều khoản sử dụng</a>
-                            <a class="btn-link text-white-50 text-decoration-none transition-all" href="#"><i
-                                    class="fas fa-angle-right me-2"></i>Hỏi đáp (FAQs)</a>
+                            <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all"
+                                href="/policy/return"><i class="fas fa-angle-right me-2"></i>Chính sách đổi trả</a>
+                            <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all"
+                                href="/policy/warranty"><i class="fas fa-angle-right me-2"></i>Chính sách bảo hành</a>
+                            <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all"
+                                href="/policy/terms"><i class="fas fa-angle-right me-2"></i>Điều khoản sử dụng</a>
+                            <a class="btn-link text-white-50 text-decoration-none transition-all" href="/policy/faq"><i
+                                    class="fas fa-angle-right me-2"></i>Câu hỏi thường gặp</a>
                         </div>
                     </div>
 

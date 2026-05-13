@@ -6,16 +6,26 @@
 
             <head>
                 <meta charset="UTF-8">
-                <title>Sản phẩm - Mobile Shop</title>
+                <title>Sản phẩm - LongHang Mobile</title>
+                <link rel="preconnect" href="https://fonts.googleapis.com">
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+                    rel="stylesheet">
+
+                <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
+                    rel="stylesheet">
+
                 <link href="/client/css/bootstrap.min.css" rel="stylesheet">
                 <link href="/client/css/style.css" rel="stylesheet">
-                <link rel="stylesheet"
-                    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
                 <style>
                     body {
                         background-color: #f4f6f8;
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        /* Đã xóa font-family lỗi */
+                        padding-top: 100px;
+                        /* Thêm padding để không bị Header đè */
                     }
 
                     /* THANH TÌM KIẾM CỐ ĐỊNH TRÊN CÙNG */
@@ -36,8 +46,8 @@
                     }
 
                     .search-box input:focus {
-                        border-color: #d70018;
-                        box-shadow: 0 0 0 3px rgba(215, 0, 24, 0.1);
+                        border-color: #d32f2f;
+                        box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
                         outline: none;
                     }
 
@@ -118,13 +128,13 @@
 
                     .filter-label:hover {
                         background: #ffebee;
-                        border-color: #d70018;
-                        color: #d70018;
+                        border-color: #d32f2f;
+                        color: #d32f2f;
                     }
 
                     .filter-checkbox:checked+.filter-label {
-                        background: #d70018;
-                        border-color: #d70018;
+                        background: #d32f2f;
+                        border-color: #d32f2f;
                         color: #fff;
                         font-weight: 600;
                     }
@@ -138,11 +148,11 @@
                     }
 
                     .form-select:focus {
-                        border-color: #d70018;
+                        border-color: #d32f2f;
                         box-shadow: none;
                     }
 
-                    /* CỤM NÚT FILTER ACTION CUỐI SIDEBAR */
+                    /* CỤM NÚT FILTER ACTION */
                     .filter-actions {
                         display: flex;
                         gap: 10px;
@@ -152,7 +162,7 @@
                     }
 
                     .btn-filter-search {
-                        background-color: #d70018;
+                        background-color: #d32f2f;
                         color: #fff;
                         border: none;
                         border-radius: 8px;
@@ -160,11 +170,11 @@
                         font-weight: bold;
                         flex: 1;
                         transition: 0.3s;
-                        box-shadow: 0 4px 10px rgba(215, 0, 24, 0.2);
+                        box-shadow: 0 4px 10px rgba(211, 47, 47, 0.2);
                     }
 
                     .btn-filter-search:hover {
-                        background-color: #c00015;
+                        background-color: #b71c1c;
                         color: #fff;
                         transform: translateY(-2px);
                     }
@@ -201,7 +211,7 @@
                     .product-card:hover {
                         transform: translateY(-5px);
                         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-                        border-color: #d70018;
+                        border-color: #d32f2f;
                     }
 
                     .product-card img {
@@ -229,13 +239,13 @@
                     }
 
                     .p-name:hover {
-                        color: #d70018;
+                        color: #d32f2f;
                     }
 
                     .p-price {
                         font-size: 17px;
                         font-weight: 700;
-                        color: #d70018;
+                        color: #d32f2f;
                     }
 
                     .specs-mini {
@@ -268,44 +278,14 @@
 
                     .sort-btn:hover {
                         background: #ffebee;
-                        color: #d70018;
-                        border-color: #d70018;
+                        color: #d32f2f;
+                        border-color: #d32f2f;
                     }
 
                     .sort-btn.active {
-                        background: #d70018;
+                        background: #d32f2f;
                         color: #fff;
-                        border-color: #d70018;
-                    }
-
-                    .skeleton-card {
-                        height: 400px;
-                        background: #fff;
-                        border-radius: 16px;
-                        position: relative;
-                        overflow: hidden;
-                    }
-
-                    .skeleton-card::after {
-                        content: "";
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: linear-gradient(90deg, #f4f4f4 25%, #e8e8e8 50%, #f4f4f4 75%);
-                        background-size: 200% 100%;
-                        animation: shimmer 1.5s infinite;
-                    }
-
-                    @keyframes shimmer {
-                        0% {
-                            background-position: 200% 0;
-                        }
-
-                        100% {
-                            background-position: -200% 0;
-                        }
+                        border-color: #d32f2f;
                     }
                 </style>
             </head>
@@ -525,6 +505,9 @@
 
                 <jsp:include page="../layout/footer.jsp" />
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
                 <script src="/client/js/product-filter.js"></script>
             </body>
 

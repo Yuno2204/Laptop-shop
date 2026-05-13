@@ -2,152 +2,293 @@
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-            <html lang="en">
+            <!DOCTYPE html>
+            <html lang="vi">
 
             <head>
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>HomePage</title>
-                <!-- Google Web Fonts -->
+                <title>Trang chủ - LongHang Mobile</title>
+
                 <link rel="preconnect" href="https://fonts.googleapis.com">
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
                 <link
                     href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
                     rel="stylesheet">
 
-                <!-- Icon Font Stylesheet -->
                 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
                     rel="stylesheet">
 
-                <!-- Libraries Stylesheet -->
                 <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
                 <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
-
-                <!-- Customized Bootstrap Stylesheet -->
                 <link href="/client/css/bootstrap.min.css" rel="stylesheet">
-
-                <!-- Template Stylesheet -->
                 <link href="/client/css/style.css" rel="stylesheet">
-            </head>
 
+                <style>
+                    body {
+                        background-color: #f4f6f8;
+                        font-family: 'Open Sans', sans-serif;
+                    }
+
+                    /* =========================================================
+           KHUNG BO SẢN PHẨM (SHOWCASE BOX)
+           ========================================================= */
+                    .showcase-box {
+                        background-color: #fff;
+                        border-radius: 16px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                        padding: 25px;
+                        margin-bottom: 40px;
+                    }
+
+                    .showcase-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 25px;
+                        border-bottom: 2px solid #f4f6f8;
+                        padding-bottom: 15px;
+                    }
+
+                    .showcase-title {
+                        font-family: 'Raleway', sans-serif;
+                        font-size: 22px;
+                        font-weight: 800;
+                        color: #333;
+                        text-transform: uppercase;
+                        margin: 0;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+
+                    .showcase-title i {
+                        color: #d32f2f;
+                        font-size: 28px;
+                    }
+
+                    /* PRODUCT CARD (Giữ nguyên độ xịn sò) */
+                    .product-card {
+                        background: #fff;
+                        border-radius: 12px;
+                        border: 1px solid #f0f0f0;
+                        padding: 15px;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                        position: relative;
+                    }
+
+                    .product-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+                        border-color: #d32f2f;
+                    }
+
+                    .product-card img {
+                        max-height: 200px;
+                        width: 100%;
+                        object-fit: contain;
+                        transition: 0.3s;
+                        margin-bottom: 15px;
+                    }
+
+                    .product-card:hover img {
+                        transform: scale(1.05);
+                    }
+
+                    .p-name {
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #333;
+                        text-decoration: none;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                        height: 42px;
+                        margin-bottom: 8px;
+                    }
+
+                    .p-name:hover {
+                        color: #d32f2f;
+                    }
+
+                    .p-price {
+                        font-size: 17px;
+                        font-weight: 800;
+                        color: #d32f2f;
+                    }
+
+                    .specs-mini {
+                        display: flex;
+                        flex-wrap: nowrap;
+                        /* ÉP TẤT CẢ PHẢI NẰM TRÊN 1 DÒNG DUY NHẤT */
+                        gap: 5px;
+                        margin: 10px 0;
+                        overflow-x: auto;
+                        /* Nếu dài quá thì cho phép vuốt ngang */
+                        scrollbar-width: none;
+                        /* Ẩn thanh cuộn (dành cho Firefox) */
+                        padding-bottom: 2px;
+                    }
+
+                    /* Ẩn thanh cuộn xấu xí (dành cho Chrome, Safari, Edge) */
+                    .specs-mini::-webkit-scrollbar {
+                        display: none;
+                    }
+
+                    .specs-mini span {
+                        background: #f1f2f6;
+                        color: #555;
+                        padding: 3px 8px;
+                        /* Tăng padding 2 bên cho rộng rãi */
+                        border-radius: 4px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        /* In đậm lên một chút cho dễ đọc */
+                        white-space: nowrap;
+                        /* BÍ QUYẾT LÀ ĐÂY: KHÔNG CHO CẮT CHỮ XUỐNG DÒNG */
+                    }
+
+                    .btn-outline-danger {
+                        color: #d32f2f;
+                        border-color: #d32f2f;
+                    }
+
+                    .btn-outline-danger:hover {
+                        background-color: #d32f2f;
+                        color: #fff;
+                    }
+
+                    .badge-hot {
+                        position: absolute;
+                        top: 10px;
+                        left: 10px;
+                        background-color: #d32f2f;
+                        color: white;
+                        font-size: 11px;
+                        font-weight: bold;
+                        padding: 4px 10px;
+                        border-radius: 6px;
+                        z-index: 2;
+                    }
+
+                    /* Hiệu ứng nhấp nháy cho icon Lửa */
+                    @keyframes fire-flicker {
+                        0% {
+                            transform: scale(1);
+                            opacity: 1;
+                        }
+
+                        50% {
+                            transform: scale(1.1);
+                            opacity: 0.8;
+                        }
+
+                        100% {
+                            transform: scale(1);
+                            opacity: 1;
+                        }
+                    }
+
+                    .fire-icon {
+                        animation: fire-flicker 1.5s infinite;
+                    }
+                </style>
+            </head>
 
             <body>
 
-                <!-- Spinner Start -->
                 <div id="spinner"
-                    class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
-                    <div class="spinner-grow text-primary" role="status"></div>
+                    class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+                    <div class="spinner-grow text-danger" role="status"></div>
                 </div>
-                <!-- Spinner End -->
 
                 <jsp:include page="../layout/header.jsp" />
                 <jsp:include page="../layout/banner.jsp" />
 
-                <!-- Fruits Shop Start-->
-                <div class="container-fluid fruite py-5">
-                    <div class="container py-5 highlight-section">
-                        <div class="tab-class text-center">
-                            <div class="row g-4">
-                                <div class="col-lg-4 text-start">
-                                    <h1>Sản phẩm nổi bật</h1>
-                                </div>
-                                <div class="col-lg-8 text-end">
-                                    <ul class="nav nav-pills d-inline-flex text-center mb-5">
-                                        <li class="nav-item">
-                                            <a class="d-flex m-2 py-2 bg-light rounded-pill active"
-                                                data-bs-toggle="pill" href="#tab-1">
-                                                <span class="text-dark" style="width: 130px;">All Products</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                <div class="container-fluid py-5">
+                    <div class="container">
+
+                        <div class="showcase-box">
+                            <div class="showcase-header">
+                                <h2 class="showcase-title">
+                                    <i class="fas fa-fire fire-icon"></i> SẢN PHẨM BÁN CHẠY NHẤT
+                                </h2>
+                                <a href="/products" class="text-danger fw-bold text-decoration-none">Xem tất cả <i
+                                        class="fas fa-chevron-right ms-1"></i></a>
                             </div>
-                            <div class="tab-content">
-                                <div id="tab-1" class="tab-pane fade show p-0 active">
-                                    <div class="row g-4">
-                                        <div class="col-lg-12">
-                                            <div class="row g-4">
-                                                <c:forEach var="product" items="${products}">
-                                                    <div class="col-md-6 col-lg-4 col-xl-3">
-                                                        <div class="rounded position-relative fruite-item">
-                                                            <div class="fruite-img">
-                                                                <a href="/product/${product.id}">
-                                                                    <div class="fruite-img">
-                                                                        <img src="/images/product/${product.image}"
-                                                                            class="img-fluid w-100"
-                                                                            alt="${product.name}">
-                                                                    </div>
-                                                                </a>
-                                                            </div>
-                                                            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute"
-                                                                style="top: 10px; left: 10px;">Hàng mới</div>
-                                                            <div
-                                                                class="p-4 border border-secondary border-top-0 rounded-bottom">
-                                                                <h4>
-                                                                    <a href="/product/${product.id}">
-                                                                        ${product.name}</a>
 
-                                                                </h4>
-                                                                <p>${product.shortDesc}</p>
-                                                                <div class="d-flex flex-lg-wrap justify-content-center">
-                                                                    <p style="font-size: 15px; text-align: center; width: 100%;"
-                                                                        class="text-dark fs-5 fw-bold mb-0">
-                                                                        <fmt:formatNumber type="number"
-                                                                            value="${product.price}" />đ
-                                                                    </p>
-                                                                    <form action="/add-product-to-cart/${product.id}"
-                                                                        method="post">
+                            <div class="row g-3">
+                                <c:forEach items="${products}" var="product" end="11">
+                                    <div class="col-6 col-md-4 col-lg-3 col-xl-3">
+                                        <div class="product-card">
+                                            <div class="badge-hot">Bán chạy</div>
+                                            <a href="/product/${product.id}" class="text-center">
+                                                <img src="/images/product/${product.image}" class="img-fluid"
+                                                    alt="${product.name}"
+                                                    onerror="this.src='/client/img/single-item.jpg'">
+                                            </a>
+                                            <div class="mt-auto">
+                                                <a href="/product/${product.id}" class="p-name">${product.name}</a>
 
-                                                                        <input type="hidden"
-                                                                            name="${_csrf.parameterName}"
-                                                                            value="${_csrf.token}" />
-                                                                        <button
-                                                                            class="mx -auto btn border border-secondary rounded-pill px-3 text-primary">
-                                                                            <i
-                                                                                class="fa fa-shopping-bag me-2 text-primary"></i>
-                                                                            Add to cart
-                                                                        </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                <div class="specs-mini">
+                                                    <c:if test="${not empty product.screenSize}">
+                                                        <span><i class="fas fa-mobile-alt"></i>
+                                                            ${product.screenSize}</span>
+                                                    </c:if>
+                                                    <c:if test="${not empty product.ram}">
+                                                        <span><i class="fas fa-memory"></i> ${product.ram}</span>
+                                                    </c:if>
+                                                    <c:if test="${not empty product.rom}">
+                                                        <span><i class="fas fa-hdd"></i> ${product.rom}</span>
+                                                    </c:if>
+                                                    <c:if test="${not empty product.battery}">
+                                                        <span><i class="fas fa-battery-full"></i>
+                                                            ${product.battery}</span>
+                                                    </c:if>
+                                                </div>
+
+                                                <div class="p-price mb-3">
+                                                    <fmt:formatNumber value="${product.price}" pattern="#,###" />đ
+                                                </div>
+
+                                                <form action="/add-product-to-cart/${product.id}" method="post"
+                                                    class="m-0">
+                                                    <input type="hidden" name="${_csrf.parameterName}"
+                                                        value="${_csrf.token}" />
+                                                    <button type="submit"
+                                                        class="btn btn-outline-danger w-100 rounded-pill fw-bold"
+                                                        style="font-size: 13px;">
+                                                        Thêm vào giỏ hàng
+                                                    </button>
+                                                </form>
                                             </div>
-                                            </c:forEach>
                                         </div>
                                     </div>
-                                </div>
+                                </c:forEach>
                             </div>
                         </div>
                     </div>
                 </div>
-                </div>
-                <!-- Fruits Shop End-->
-
 
                 <jsp:include page="../layout/feature.jsp" />
-
                 <jsp:include page="../layout/footer.jsp" />
 
-
-
-                <!-- Back to Top -->
-                <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                <a href="#" class="btn btn-danger border-3 border-danger rounded-circle back-to-top"><i
                         class="fa fa-arrow-up"></i></a>
 
-
-                <!-- JavaScript Libraries -->
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
                 <script src="/client/lib/easing/easing.min.js"></script>
                 <script src="/client/lib/waypoints/waypoints.min.js"></script>
                 <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
                 <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
-
-                <!-- Template Javascript -->
                 <script src="/client/js/main.js"></script>
             </body>
-
 
             </html>
