@@ -119,11 +119,8 @@
                         </p>
 
                         <div class="d-flex align-items-center gap-3 flex-wrap mb-4">
-                            <a href="/products" class="btn btn-red-gradient px-5 py-3 rounded-pill fw-bold shadow-sm">
+                            <a href="/products" class="btn btn-outline-red px-4 py-3 rounded-pill shadow-sm">
                                 <i class="fas fa-shopping-cart me-2"></i> Mua Sắm Ngay
-                            </a>
-                            <a href="#khuyen-mai" class="btn btn-outline-red px-4 py-3 rounded-pill shadow-sm">
-                                <i class="fas fa-fire me-2"></i> Xem Khuyến Mãi
                             </a>
                         </div>
 
@@ -150,32 +147,29 @@
 
                             <div class="carousel-inner" role="listbox">
                                 <div class="carousel-item active p-4">
-                                    <img src="/client/img/hero-img-1.png"
-                                        class="img-fluid w-100 object-fit-contain floating-img" style="height: 350px;"
-                                        alt="Gaming">
+                                    <img src="/client/img/1.png" class="img-fluid w-100 object-fit-contain floating-img"
+                                        style="height: 350px;" alt="iPhone">
                                     <span
                                         class="position-absolute top-0 end-0 m-3 badge bg-danger px-3 py-2 fs-6 rounded-pill shadow-sm">
-                                        <i class="fas fa-gamepad me-1"></i> Gaming
+                                        <i class="fas fa-mobile-alt me-1"></i> iPhone
                                     </span>
                                 </div>
 
                                 <div class="carousel-item p-4">
-                                    <img src="/client/img/hero-img-3.png"
-                                        class="img-fluid w-100 object-fit-contain floating-img" style="height: 350px;"
-                                        alt="Laptop">
+                                    <img src="/client/img/2.png" class="img-fluid w-100 object-fit-contain floating-img"
+                                        style="height: 350px;" alt="Samsung">
                                     <span
                                         class="position-absolute top-0 end-0 m-3 badge bg-dark px-3 py-2 fs-6 rounded-pill shadow-sm">
-                                        <i class="fas fa-laptop me-1"></i> Laptop Pro
+                                        <i class="fas fa-mobile-alt me-1"></i> Samsung
                                     </span>
                                 </div>
 
                                 <div class="carousel-item p-4">
-                                    <img src="/client/img/hero-img-2.png"
-                                        class="img-fluid w-100 object-fit-contain floating-img" style="height: 350px;"
-                                        alt="Phụ kiện">
+                                    <img src="/client/img/3.png" class="img-fluid w-100 object-fit-contain floating-img"
+                                        style="height: 350px;" alt="OPPO">
                                     <span class="position-absolute top-0 end-0 m-3 badge"
                                         style="background: #e91e63; padding: .5rem 1rem; font-size: 1rem; border-radius: 50rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">
-                                        <i class="fas fa-headphones-alt me-1"></i> Âm Thanh
+                                        <i class="fas fa-mobile-alt me-1"></i> OPPO
                                     </span>
                                 </div>
                             </div>

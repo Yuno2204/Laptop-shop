@@ -26,10 +26,18 @@ public class ProductClientController {
     private ProductRepository productRepository;
 
     @GetMapping("/products")
-    public String productPage(Model model) {
-        Pageable pageable = PageRequest.of(0, 12, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Product> page = productRepository.findAll(pageable);
-        model.addAttribute("products", page.getContent());
+    public String productPage(Model model,
+            @RequestParam(value = "page", defaultValue = "1") int page) {
+
+        Pageable pageable = PageRequest.of(page - 1, 12, Sort.by(Sort.Direction.DESC, "id"));
+
+        // SỬ DỤNG productRepository thay vì productService để không bị lỗi đỏ
+        Page<Product> prs = this.productRepository.findAll(pageable);
+
+        model.addAttribute("products", prs.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", prs.getTotalPages());
+
         return "client/product/show";
     }
 

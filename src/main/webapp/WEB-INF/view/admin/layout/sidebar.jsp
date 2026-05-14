@@ -28,6 +28,10 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
                             Đơn hàng
                         </a>
+                        <a class="nav-link" href="/admin/inventory">
+                            <div class="sb-nav-link-icon"><i class="fas fa-warehouse"></i></div>
+                            Quản lý tồn kho
+                        </a>
 
                     </div>
                 </div>

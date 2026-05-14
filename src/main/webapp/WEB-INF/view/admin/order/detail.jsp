@@ -135,6 +135,13 @@
                                             <a href="/admin/order/update/${order.id}" class="btn btn-warning px-4 ms-2">
                                                 <i class="fas fa-edit me-2"></i>Cập nhật trạng thái
                                             </a>
+
+                                            <c:if test="${order.status eq 'SHIPPING'}">
+                                                <a href="/admin/order/invoice/${order.id}" target="_blank"
+                                                    class="btn btn-success">
+                                                    <i class="fas fa-print"></i> Xuất hóa đơn vận chuyển
+                                                </a>
+                                            </c:if>
                                         </div>
                                     </div>
                                 </div>

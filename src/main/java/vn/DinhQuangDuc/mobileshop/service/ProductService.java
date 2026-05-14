@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
@@ -219,5 +221,9 @@ public class ProductService {
                 p.getId(), p.getName(), p.getPrice(), p.getQuantity(),
                 p.getFactory() // Truyền thêm factory
         )).collect(Collectors.toList());
+    }
+
+    public Page<Product> fetchProductsWithPagination(Pageable pageable) {
+        return this.productRepository.findAll(pageable);
     }
 }

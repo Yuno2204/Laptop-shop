@@ -95,7 +95,48 @@
                     </div>
                   </div>
                 </div>
+                <c:if test="${totalPages > 1}">
+                  <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                      <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="/admin/user?page=${currentPage - 1}" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                        </a>
+                      </li>
 
+                      <c:forEach begin="1" end="${totalPages}" varStatus="loop">
+                        <li class="page-item ${currentPage == loop.index ? 'active' : ''}">
+                          <a class="page-link" href="/admin/user?page=${loop.index}">${loop.index}</a>
+                        </li>
+                      </c:forEach>
+
+                      <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="/admin/user?page=${currentPage + 1}" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+                </c:if>
+
+                <style>
+                  /* CSS làm đẹp nút phân trang theo màu chủ đạo của bạn */
+                  .pagination .page-link {
+                    color: #6cd5ff;
+                    border-radius: 5px;
+                    margin: 0 2px;
+                  }
+
+                  .pagination .page-item.active .page-link {
+                    background-color: #6cd5ff;
+                    border-color: #6cd5ff;
+                    color: white;
+                  }
+
+                  .pagination .page-item.disabled .page-link {
+                    color: #ccc;
+                  }
+                </style>
               </div>
             </main>
             <jsp:include page="../layout/footer.jsp"></jsp:include>

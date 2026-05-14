@@ -27,7 +27,7 @@
                     }
 
                     .table-main thead {
-                        background-color: #ff025b;
+                        background-color: #f0444a;
                         color: white;
                         border: none;
                     }
@@ -48,9 +48,9 @@
                     }
 
                     .btn-view-detail:hover {
-                        background-color: #ff025b;
+                        background-color: #f0444a;
                         color: white;
-                        border-color: #ff025b;
+                        border-color: #f0444a;
                     }
                 </style>
             </head>

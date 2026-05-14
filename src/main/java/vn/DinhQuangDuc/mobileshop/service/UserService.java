@@ -3,6 +3,8 @@ package vn.DinhQuangDuc.mobileshop.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -124,5 +126,9 @@ public class UserService {
                 u.getId(), u.getEmail(), u.getFullName(),
                 u.getPhone(), // Truyền thêm phone
                 u.getRole() != null ? u.getRole().getName() : "USER")).collect(Collectors.toList());
+    }
+
+    public Page<User> fetchUsersWithPagination(Pageable pageable) {
+        return this.userRepository.findAll(pageable);
     }
 }

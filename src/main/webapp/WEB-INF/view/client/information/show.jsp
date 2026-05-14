@@ -37,7 +37,7 @@
 
                     /* Header Banner Custom */
                     .info-header {
-                        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(183, 28, 28, 0.4)), url('/client/img/cart-page-header-img.jpg');
+                        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(183, 28, 28, 0.4)), url('/client/img/anhnen.jpg');
                         background-size: cover;
                         background-position: center;
                         padding: 100px 0 60px;
@@ -174,10 +174,7 @@
                 <div class="container-fluid info-header">
                     <h1 class="display-3 text-white fw-bold animate__animated animate__fadeInDown">${pageTitle}</h1>
                     <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb justify-content-center bg-transparent mb-0">
-                            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                            <li class="breadcrumb-item active">${pageTitle}</li>
-                        </ol>
+
                     </nav>
                 </div>
 

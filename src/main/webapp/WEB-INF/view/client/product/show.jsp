@@ -299,8 +299,7 @@
                         <div class="col-lg-3 col-md-4 mb-4">
                             <div class="search-box">
                                 <i class="fas fa-search"></i>
-                                <input type="text" id="searchInput"
-                                    placeholder="Tìm tên điện thoại, model... (Ấn Enter)">
+                                <input type="text" id="searchInput" placeholder="Tìm tên điện thoại...">
                             </div>
 
                             <div class="filter-sidebar">
@@ -338,6 +337,9 @@
                                             <option value="Cấu hình cao">Cấu hình cao</option>
                                             <option value="Pin trâu">Pin trâu</option>
                                             <option value="Chụp ảnh đẹp">Chụp ảnh đẹp</option>
+                                            <option value="Mỏng nhẹ">Mỏng nhẹ</option>
+                                            <option value="Nhỏ gọn, dễ cầm nắm">Nhỏ gọn, dễ cầm nắm</option>
+                                            <option value="Livestream">Livestream</option>
                                         </select>
                                     </div>
 
@@ -497,7 +499,44 @@
                                         </div>
                                     </div>
                                 </c:forEach>
+
                             </div>
+                            <c:if test="${totalPages > 1}">
+                                <nav class="mt-5 d-flex justify-content-center">
+                                    <%-- Thêm d-flex và flex-row vào ul để ép các thẻ li nằm ngang --%>
+                                        <ul class="pagination custom-pagination mb-0 d-flex flex-row">
+
+                                            <%-- Mũi tên TRƯỚC --%>
+                                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                                    <a class="page-link" href="/products?page=${currentPage - 1}"
+                                                        aria-label="Previous">
+                                                        <i class="fas fa-chevron-left"></i>
+                                                    </a>
+                                                </li>
+
+                                                <%-- Danh sách số trang --%>
+                                                    <c:forEach begin="1" end="${totalPages}" varStatus="loop">
+                                                        <li
+                                                            class="page-item ${currentPage == loop.index ? 'active' : ''}">
+                                                            <a class="page-link"
+                                                                href="/products?page=${loop.index}">${loop.index}</a>
+                                                        </li>
+                                                    </c:forEach>
+
+                                                    <%-- Mũi tên SAU --%>
+                                                        <li
+                                                            class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                                            <a class="page-link"
+                                                                href="/products?page=${currentPage + 1}"
+                                                                aria-label="Next">
+                                                                <i class="fas fa-chevron-right"></i>
+                                                            </a>
+                                                        </li>
+
+                                        </ul>
+                                </nav>
+                            </c:if>
+
                             <nav id="pagination" class="mt-5 d-flex justify-content-center"></nav>
                         </div>
                     </div>

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -180,5 +182,9 @@ public class OrderService {
     // 3. Hàm lấy danh sách doanh thu
     public List<Order> getRevenueByDate(LocalDateTime start, LocalDateTime end) {
         return orderRepository.findRevenueOrders(start, end);
+    }
+
+    public Page<Order> fetchOrdersWithPagination(Pageable pageable) {
+        return this.orderRepository.findAll(pageable);
     }
 }

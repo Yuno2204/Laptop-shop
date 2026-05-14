@@ -234,6 +234,10 @@
                                                             <form:option value="Cấu hình cao">Cấu hình cao</form:option>
                                                             <form:option value="Pin trâu">Pin trâu</form:option>
                                                             <form:option value="Chụp ảnh đẹp">Chụp ảnh đẹp</form:option>
+                                                            <form:option value="Mỏng nhẹ">Mỏng nhẹ</form:option>
+                                                            <form:option value="Nhỏ gọn, dễ cầm nắm">Nhỏ gọn, dễ cầm nắm
+                                                            </form:option>
+                                                            <form:option value="Livestream">Livestream</form:option>
                                                         </form:select>
                                                     </div>
                                                 </div>

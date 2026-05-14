@@ -40,9 +40,30 @@ public class UserController {
     }
 
     @GetMapping("/admin/user")
-    public String getUserPage(Model model) {
+    public String getUserPage(Model model, @RequestParam(value = "page", defaultValue = "1") int page) {
         List<User> users = this.userService.getAllUsers();
-        model.addAttribute("users1", users);
+
+        // --- XỬ LÝ PHÂN TRANG ---
+        int pageSize = 10;
+        int totalItems = users.size();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+        if (totalPages == 0)
+            totalPages = 1;
+        if (page < 1)
+            page = 1;
+        if (page > totalPages)
+            page = totalPages;
+
+        int startItem = (page - 1) * pageSize;
+        int endItem = Math.min(startItem + pageSize, totalItems);
+        List<User> pagedUsers = users.subList(startItem, endItem);
+        // ------------------------
+
+        // Gửi danh sách đã cắt 10 dòng (pagedUsers) thay vì toàn bộ (users)
+        model.addAttribute("users1", pagedUsers);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
         return "admin/user/show";
     }
 

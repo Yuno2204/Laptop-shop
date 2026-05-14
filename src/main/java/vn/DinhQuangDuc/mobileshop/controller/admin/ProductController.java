@@ -38,9 +38,29 @@ public class ProductController {
     }
 
     @GetMapping("/admin/product")
-    public String getDashboard(Model model) {
-        List<Product> product = this.productService.fetchProducts();
-        model.addAttribute("products", product);
+    public String getDashboard(Model model, @RequestParam(value = "page", defaultValue = "1") int page) {
+        List<Product> products = this.productService.fetchProducts();
+
+        // --- XỬ LÝ PHÂN TRANG ---
+        int pageSize = 10;
+        int totalItems = products.size();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+        if (totalPages == 0)
+            totalPages = 1;
+        if (page < 1)
+            page = 1;
+        if (page > totalPages)
+            page = totalPages;
+
+        int startItem = (page - 1) * pageSize;
+        int endItem = Math.min(startItem + pageSize, totalItems);
+        List<Product> pagedProducts = products.subList(startItem, endItem);
+        // ------------------------
+
+        model.addAttribute("products", pagedProducts);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
         return "admin/product/show";
     }
 

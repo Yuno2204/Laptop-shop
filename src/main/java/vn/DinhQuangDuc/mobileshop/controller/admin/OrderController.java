@@ -35,39 +35,74 @@ public class OrderController {
     }
 
     // Hiển thị danh sách đơn hàng
+    // Hiển thị danh sách đơn hàng
     @GetMapping("/admin/order")
     public String getDashboard(Model model,
             @RequestParam(value = "startDate", required = false) String startDate,
-            @RequestParam(value = "endDate", required = false) String endDate) {
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "page", defaultValue = "1") int page) { // Thêm tham số page
 
         List<Order> orders;
+        List<Order> revenueOrders;
 
-        // 1. Nếu có lọc theo ngày (Vẫn ưu tiên kết quả từ Service - Service này nên trả
-        // về đơn DELIVERED)
+        // 1. Lấy TẤT CẢ đơn hàng
+        orders = this.orderService.fetchAllOrders();
+
         if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
             LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
             LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
-            orders = this.orderService.getRevenueByDate(start, end);
-        }
-        // 2. MẶC ĐỊNH: Chỉ lấy đơn hàng có trạng thái DELIVERED
-        else {
-            List<Order> allOrders = this.orderService.fetchAllOrders();
-            orders = allOrders.stream()
-                    .filter(o -> "DELIVERED".equals(o.getStatus()))
+
+            // Lọc danh sách tổng theo ngày tạo
+            orders = orders.stream()
+                    .filter(o -> o.getOrderDate() != null
+                            && !o.getOrderDate().isBefore(start)
+                            && !o.getOrderDate().isAfter(end))
+                    .collect(Collectors.toList());
+
+            // 2. Doanh thu:
+            revenueOrders = this.orderService.getRevenueByDate(start, end);
+        } else {
+            // Doanh thu mặc định
+            revenueOrders = orders.stream()
+                    .filter(o -> "DELIVERED".equals(o.getStatus()) || "SUCCESS".equals(o.getStatus()))
                     .collect(Collectors.toList());
         }
 
         // Sắp xếp đơn mới nhất lên đầu
         orders.sort((o1, o2) -> Long.compare(o2.getId(), o1.getId()));
+        revenueOrders.sort((o1, o2) -> Long.compare(o2.getId(), o1.getId()));
 
-        double totalRevenue = orders.stream()
+        // Tính tổng tiền dựa trên TẤT CẢ đơn hàng lọc được (Giữ nguyên không đổi)
+        double totalRevenue = revenueOrders.stream()
                 .mapToDouble(Order::getTotalPrice)
                 .sum();
 
-        model.addAttribute("orders", orders); // Đặt tên là orders để khớp với JSP bên dưới
+        // --- BẮT ĐẦU CẮT 10 DÒNG CHO BẢNG HIỂN THỊ ĐƠN HÀNG ---
+        int pageSize = 10;
+        int totalItems = orders.size();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+        if (totalPages == 0)
+            totalPages = 1;
+        if (page < 1)
+            page = 1;
+        if (page > totalPages)
+            page = totalPages;
+
+        int startItem = (page - 1) * pageSize;
+        int endItem = Math.min(startItem + pageSize, totalItems);
+        List<Order> pagedOrders = orders.subList(startItem, endItem);
+        // --------------------------------------------------------
+
+        // Trả về View
+        model.addAttribute("orders", pagedOrders); // Chỉ truyền 10 đơn lên giao diện
+        model.addAttribute("revenueOrders", revenueOrders); // Bảng doanh thu giữ nguyên
         model.addAttribute("totalRevenue", totalRevenue);
+
+        // Gửi lại các biến lọc và trang
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
 
         return "admin/order/show";
     }
@@ -166,5 +201,13 @@ public class OrderController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @GetMapping("/admin/order/invoice/{id}")
+    public String getInvoicePage(Model model, @PathVariable long id) {
+        Order order = this.orderService.fetchOrderById(id).get();
+        model.addAttribute("order", order);
+        model.addAttribute("orderDetails", order.getOrderDetails());
+        return "admin/order/invoice";
     }
 }

@@ -2,8 +2,8 @@
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark shadow-sm">
-            <a class="navbar-brand ps-3 fw-bold" href="/admin">
-                <i class="fas fa-mobile-alt text-primary me-2"></i>LongHang
+            <a class="navbar-brand ps-3 fw-bold text-danger" href="/admin">
+                <i class="fas fa-mobile-alt text-primary me-2"></i>LongHang Mobile
             </a>
 
             <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0 text-white-50" id="sidebarToggle"
