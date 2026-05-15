@@ -257,6 +257,7 @@
                                                         <label for="avatarFile" class="form-label">Ảnh:</label>
                                                         <input class="form-control" type="file" id="avatarFile"
                                                             accept=".png, .jpg, .jpeg" name="imagesFile" />
+                                                        <form:errors path="image" cssClass="text-danger" />
                                                     </div>
                                                     <div class="col-12 mb-3">
                                                         <img style="max-height: 250px; display: none;"

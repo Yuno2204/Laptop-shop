@@ -3,11 +3,13 @@ package vn.DinhQuangDuc.mobileshop.controller.client;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import vn.DinhQuangDuc.mobileshop.domain.User;
 import vn.DinhQuangDuc.mobileshop.service.UserService;
 
@@ -35,7 +37,16 @@ public class AccountController {
     }
 
     @PostMapping("/account/update")
-    public String updateAccount(@ModelAttribute("user") User user, HttpServletRequest request) {
+    public String updateAccount(
+            @ModelAttribute("user") @Valid User user, // Thêm @Valid
+            BindingResult bindingResult, // Thêm BindingResult để bắt lỗi
+            HttpServletRequest request) {
+
+        // Nếu có lỗi nhập liệu (để trống, sai regex...) -> Trả lại trang cũ kèm báo đỏ
+        if (bindingResult.hasErrors()) {
+            return "client/account/show";
+        }
+
         this.userService.updateUserProfile(user);
         request.getSession().setAttribute("fullName", user.getFullName());
         return "redirect:/account?success=profile";

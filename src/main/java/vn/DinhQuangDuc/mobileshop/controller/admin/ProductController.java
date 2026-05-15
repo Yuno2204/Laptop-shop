@@ -71,18 +71,24 @@ public class ProductController {
     }
 
     @PostMapping("/admin/product/create")
-    public String createUserPage(Model model, @ModelAttribute("newProduct") @Valid Product product,
-            BindingResult newUserBindingResult,
-            @RequestParam("imagesFile") MultipartFile file) {
-        List<FieldError> errors = newUserBindingResult.getFieldErrors();
-        for (FieldError error : errors) {
-            System.out.println(">>>>>>" + error.getField() + " - " + error.getDefaultMessage());
+    public String createUserPage(Model model,
+            @ModelAttribute("newProduct") @Valid Product product,
+            BindingResult bindingResult,
+            @RequestParam(value = "imagesFile", required = false) MultipartFile file) {
+
+        if (file == null || file.isEmpty() || file.getOriginalFilename().isEmpty()) {
+            bindingResult.rejectValue("image", "error.product", "Vui lòng chọn ảnh cho sản phẩm");
         }
-        if (newUserBindingResult.hasErrors()) {
-            return "/admin/product/create";
+
+        if (bindingResult.hasErrors()) {
+            return "admin/product/create";
         }
+
         String image = this.uploadService.handleSaveUploadFile(file, "product");
         product.setImage(image);
+
+        product.setSold(0);
+
         this.productService.createProduct(product);
         return "redirect:/admin/product";
     }
@@ -107,13 +113,7 @@ public class ProductController {
             Model model,
             @ModelAttribute("newProduct") @Valid Product product,
             BindingResult bindingResult,
-            @RequestParam("imagesFile") MultipartFile file) {
-
-        // debug lỗi validate
-        List<FieldError> errors = bindingResult.getFieldErrors();
-        for (FieldError error : errors) {
-            System.out.println(">>>> " + error.getField() + " - " + error.getDefaultMessage());
-        }
+            @RequestParam(value = "imagesFile", required = false) MultipartFile file) {
 
         if (bindingResult.hasErrors()) {
             return "admin/product/update";
@@ -122,13 +122,11 @@ public class ProductController {
         Product currentProduct = this.productService.getProductByID(product.getId());
 
         if (currentProduct != null) {
-            // xử lý upload ảnh nếu có
             if (file != null && !file.isEmpty()) {
                 String image = this.uploadService.handleSaveUploadFile(file, "product");
                 currentProduct.setImage(image);
             }
 
-            // update field đúng của Product
             currentProduct.setName(product.getName());
             currentProduct.setPrice(product.getPrice());
             currentProduct.setQuantity(product.getQuantity());

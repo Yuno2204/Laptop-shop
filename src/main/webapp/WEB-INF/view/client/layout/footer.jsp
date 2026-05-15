@@ -32,13 +32,12 @@
                         <div class="d-flex flex-column text-start footer-item">
                             <h4 class="text-light mb-4">Tài Khoản</h4>
                             <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all"
-                                href="/profile"><i class="fas fa-angle-right me-2"></i>Quản lý tài khoản</a>
+                                href="/account"><i class="fas fa-angle-right me-2"></i>Quản lý tài khoản</a>
                             <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all" href="/cart"><i
                                     class="fas fa-angle-right me-2"></i>Giỏ hàng của tôi</a>
                             <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all"
                                 href="/order-history"><i class="fas fa-angle-right me-2"></i>Lịch sử mua hàng</a>
-                            <a class="btn-link text-white-50 text-decoration-none transition-all" href="/contact"><i
-                                    class="fas fa-angle-right me-2"></i>Hỗ trợ khách hàng</a>
+
                         </div>
                     </div>
 
@@ -65,12 +64,14 @@
                     <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                         <span class="text-light">
                             <i class="fas fa-copyright text-light me-2"></i> 2026
-                            <a href="/" class="text-primary fw-bold text-decoration-none">LongHang Mobile</a>. Đã đăng
+                            <a href="https://www.facebook.com/profile.php?id=100090097931335"
+                                class="text-primary fw-bold text-decoration-none">LongHang Mobile</a>. Đã đăng
                             ký bản quyền.
                         </span>
                     </div>
                     <div class="col-md-6 my-auto text-center text-md-end text-white-50">
-                        Thiết kế bởi <a class="text-primary text-decoration-none fw-bold" href="#">Đinh Quang Đức</a>
+                        Thiết kế bởi <a class="text-primary text-decoration-none fw-bold"
+                            href="https://www.facebook.com/cenlove.2204">Đinh Quang Đức</a>
                     </div>
                 </div>
             </div>

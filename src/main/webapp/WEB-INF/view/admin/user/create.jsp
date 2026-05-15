@@ -41,101 +41,84 @@
                   </ol>
                   <div class="container mt-5">
                     <div class="row">
-                      <div class="col-md-6 col-12 mx-auto">
+                      <div class="col-md-8 col-12 mx-auto">
                         <h4>Thêm mới người dùng</h4>
                         <hr />
                         <form:form method="post" action="/admin/user/create" modelAttribute="newUser" class="row"
                           enctype="multipart/form-data">
+
                           <div class="mb-3 col-12 col-md-6">
-                            <label for="email" class="form-label">Email:</label>
-
-                            <spring:bind path="newUser.email">
-                              <form:input path="email" id="email" type="email"
-                                class="form-control ${status.error ? 'is-invalid' : ''}" />
-
-                              <c:if test="${status.error}">
-                                <div class="invalid-feedback d-block">
-                                  ${status.errorMessages[0]}
-                                </div>
-                              </c:if>
-                            </spring:bind>
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span>:</label>
+                            <form:input path="email" id="email" type="email" class="form-control" />
+                            <form:errors path="email" cssClass="text-danger d-block mt-1" />
                           </div>
 
                           <div class="mb-3 col-12 col-md-6">
-                            <label for="password" class="form-label">Mật khẩu:</label>
-
-                            <spring:bind path="newUser.password">
-                              <form:password path="password" id="password"
-                                class="form-control ${status.error ? 'is-invalid' : ''}" />
-
-                              <c:if test="${status.error}">
-                                <div class="invalid-feedback d-block">
-                                  ${status.errorMessages[0]}
-                                </div>
-                              </c:if>
-                            </spring:bind>
+                            <label for="password" class="form-label">Mật khẩu <span
+                                class="text-danger">*</span>:</label>
+                            <form:password path="password" id="password" class="form-control" />
+                            <form:errors path="password" cssClass="text-danger d-block mt-1" />
                           </div>
 
                           <div class="mb-3 col-12 col-md-6">
-                            <label for="phone" class="form-label">Số điện thoại:</label>
-
-                            <spring:bind path="newUser.phone">
-                              <form:input path="phone" id="phone" type="text"
-                                class="form-control ${status.error ? 'is-invalid' : ''}" />
-
-                              <c:if test="${status.error}">
-                                <div class="invalid-feedback d-block">
-                                  ${status.errorMessages[0]}
-                                </div>
-                              </c:if>
-                            </spring:bind>
+                            <label for="fullName" class="form-label">Họ và tên <span
+                                class="text-danger">*</span>:</label>
+                            <form:input path="fullName" id="fullName" type="text" class="form-control" />
+                            <form:errors path="fullName" cssClass="text-danger d-block mt-1" />
                           </div>
 
                           <div class="mb-3 col-12 col-md-6">
-                            <label for="fullName" class="form-label">Họ và tên:</label>
+                            <label for="phone" class="form-label">Số điện thoại <span
+                                class="text-danger">*</span>:</label>
+                            <form:input path="phone" id="phone" type="text" class="form-control" />
+                            <form:errors path="phone" cssClass="text-danger d-block mt-1" />
+                          </div>
 
-                            <spring:bind path="newUser.fullName">
-                              <form:input path="fullName" id="fullName" type="text"
-                                class="form-control ${status.error ? 'is-invalid' : ''}" />
+                          <div class="mb-3 col-12 col-md-6">
+                            <label class="form-label">Giới tính <span class="text-danger">*</span>:</label>
+                            <form:select path="gender" class="form-select">
+                              <form:option value="">-- Chọn giới tính --</form:option>
+                              <form:option value="Male">Nam</form:option>
+                              <form:option value="Female">Nữ</form:option>
+                              <form:option value="Other">Khác</form:option>
+                            </form:select>
+                            <form:errors path="gender" cssClass="text-danger d-block mt-1" />
+                          </div>
 
-                              <c:if test="${status.error}">
-                                <div class="invalid-feedback d-block">
-                                  ${status.errorMessages[0]}
-                                </div>
-                              </c:if>
-                            </spring:bind>
+                          <div class="mb-3 col-12 col-md-6">
+                            <label class="form-label">Ngày sinh <span class="text-danger">*</span>:</label>
+                            <form:input type="date" path="dateOfBirth" class="form-control" />
+                            <form:errors path="dateOfBirth" cssClass="text-danger d-block mt-1" />
                           </div>
 
                           <div class="mb-3 col-12">
-                            <label for="address" class="form-label">Địa chỉ:</label>
-
-                            <spring:bind path="newUser.address">
-                              <form:input path="address" id="address" type="text"
-                                class="form-control ${status.error ? 'is-invalid' : ''}" />
-
-                              <c:if test="${status.error}">
-                                <div class="invalid-feedback d-block">
-                                  ${status.errorMessages[0]}
-                                </div>
-                              </c:if>
-                            </spring:bind>
+                            <label for="address" class="form-label">Địa chỉ <span class="text-danger">*</span>:</label>
+                            <form:input path="address" id="address" type="text" class="form-control" />
+                            <form:errors path="address" cssClass="text-danger d-block mt-1" />
                           </div>
+
                           <div class="mb-3 col-12 col-md-6">
-                            <label class="form-label">Vai trò:</label>
+                            <label class="form-label">Vai trò <span class="text-danger">*</span>:</label>
                             <form:select class="form-select" path="role.name">
-                              <form:option value="ADMIN">ADMIN</form:option>
                               <form:option value="USER">USER</form:option>
+                              <form:option value="ADMIN">ADMIN</form:option>
                             </form:select>
                           </div>
+
                           <div class="mb-3 col-12 col-md-6">
-                            <label for="avatarFile" class="form-label">Ảnh đại diện:</label>
+                            <label for="avatarFile" class="form-label">Ảnh đại diện <span
+                                class="text-danger">*</span>:</label>
                             <input class="form-control" type="file" id="avatarFile" accept=".png, .jpg, .jpeg"
                               name="imagesFile" />
+                            <form:errors path="avatar" cssClass="text-danger d-block mt-1" />
                           </div>
+
                           <div class="col-12 mb-3">
-                            <img style="max-height: 250px; display: none;" alt="avatar preview" id="avatarPreview" />
+                            <img style="max-height: 250px; display: none; border: 1px solid #ddd; padding: 4px;"
+                              alt="avatar preview" id="avatarPreview" />
                           </div>
-                          <div class="d-flex justify-content-between">
+
+                          <div class="d-flex justify-content-between w-100">
                             <button type="submit" class="btn btn-primary">Thêm mới</button>
                             <a href="/admin/user" class="btn btn-success">Quay lại</a>
                           </div>

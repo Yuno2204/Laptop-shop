@@ -15,7 +15,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "products")
@@ -23,32 +23,61 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @NotBlank(message = "Tên sản phẩm không được để trống")
     private String name;
+
     @NotNull(message = "Giá không được để trống")
     @DecimalMin(value = "0.0", inclusive = false, message = "Giá phải lớn hơn 0")
-    private double price;
+    private Double price;
+
     private String image;
+
     @NotBlank(message = "Mô tả chi tiết không được để trống")
     @Column(columnDefinition = "MEDIUMTEXT")
     private String detailDesc;
+
     @NotBlank(message = "Mô tả ngắn không được để trống")
     private String shortDesc;
+
     @NotNull(message = "Số lượng không được để trống")
     @Min(value = 1, message = "Số lượng phải > 0")
-    private long quantity;
-    private long sold;
+    private Long quantity;
+
+    private long sold = 0;
     @NotBlank(message = "Thương hiệu không được để trống")
     private String factory;
+
+    @NotBlank(message = "Mục tiêu khách hàng không được để trống")
     private String target;
+
+    @NotBlank(message = "Hệ điều hành không được để trống")
     private String os;
+
+    @NotBlank(message = "Dung lượng ROM không được để trống")
     private String rom;
+
+    @NotBlank(message = "Dung lượng RAM không được để trống")
     private String ram;
+
+    @NotBlank(message = "Tần số quét không được để trống")
     private String refreshRate;
+
+    @NotBlank(message = "Chip không được để trống")
     private String cpu;
+
+    @NotBlank(message = "Kích thước màn hình không được để trống")
+    @Pattern(regexp = "^$|^\\d+(\\.\\d+)?\\s?(inch|''|\")$", message = "Kích thước màn hình phải theo định dạng. VD: 6.1 inch, 6.7\"")
     private String screenSize;
+
+    @NotBlank(message = "Dung lượng pin không được để trống")
+    @Pattern(regexp = "^$|^\\d+\\s?mAh$", message = "Dung lượng pin phải theo định dạng. VD: 5000mAh")
     private String battery;
+
+    @NotBlank(message = "Công suất sạc nhanh không được để trống")
+    @Pattern(regexp = "^$|^\\d+\\s?W$", message = "Sạc nhanh phải theo định dạng. VD: 20W, 120W")
     private String fastCharge;
+
     @OneToMany(mappedBy = "product")
     @JsonIgnore
     private List<OrderDetail> orderDetails;
@@ -61,7 +90,6 @@ public class Product {
         this.orderDetails = orderDetails;
     }
 
-    // Getter và Setter (Bắt buộc phải có để Spring bind dữ liệu)
     public String getCpu() {
         return cpu;
     }
@@ -142,11 +170,11 @@ public class Product {
         this.name = name;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -174,11 +202,11 @@ public class Product {
         this.shortDesc = shortDesc;
     }
 
-    public long getQuantity() {
+    public Long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(long quantity) {
+    public void setQuantity(Long quantity) {
         this.quantity = quantity;
     }
 
@@ -214,5 +242,4 @@ public class Product {
                 + refreshRate + ", cpu=" + cpu + ", screenSize=" + screenSize + ", battery=" + battery + ", fastCharge="
                 + fastCharge + "]";
     }
-
 }

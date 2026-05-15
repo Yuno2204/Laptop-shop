@@ -26,32 +26,31 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @NotNull
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
     private String email;
 
     @NotBlank(message = "Mật khẩu không được để trống")
-    // @Size(min = 6, max = 100, message = "Mật khẩu phải từ 6 đến 100 ký tự")
-    @StrongPassword(message = "Phai co 8 ki tu")
+    @StrongPassword(message = "Mật khẩu phải có ít nhất 8 ký tự")
     @JsonIgnore
     private String password;
 
-    // @NotBlank(message = "Họ và tên không được để trống")
-    // @Size(min = 3, max = 100, message = "Họ và tên phải từ 3 đến 100 ký tự")
+    @NotBlank(message = "Họ và tên không được để trống")
+    @Pattern(regexp = "^$|^.{3,36}$", message = "Họ và tên phải từ 3 đến 36 ký tự")
     private String fullName;
 
-    // @NotBlank(message = "Địa chỉ không được để trống")
-    // @Size(max = 255, message = "Địa chỉ tối đa 255 ký tự")
+    @NotBlank(message = "Địa chỉ không được để trống")
     private String address;
 
-    // @NotBlank(message = "Số điện thoại không được để trống")
-    // @Pattern(regexp = "^(0|\\+84)\\d{9}$", message = "Số điện thoại không hợp
-    // lệ")
+    @NotBlank(message = "Số điện thoại không được để trống")
+    @Pattern(regexp = "^$|^(0|\\+84)\\d{9}$", message = "Số điện thoại không hợp lệ ")
     private String phone;
     private String avatar;
-
+    @NotBlank(message = "Vui lòng chọn giới tính")
     private String gender;
+    @NotBlank(message = "Vui lòng nhập ngày sinh")
     private String dateOfBirth;
 
     public String getGender() {

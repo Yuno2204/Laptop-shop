@@ -77,38 +77,58 @@
                                                 aria-labelledby="pills-profile-tab" tabindex="0">
                                                 <form:form action="/account/update" method="post" modelAttribute="user">
                                                     <form:hidden path="id" />
+                                                    <form:hidden path="password" />
+                                                    <form:hidden path="avatar" />
+
                                                     <div class="row g-3">
                                                         <div class="col-12">
                                                             <label class="form-label fw-bold">Email (Không thể thay
                                                                 đổi)</label>
                                                             <form:input path="email" class="form-control bg-light p-2"
                                                                 readonly="true" />
+                                                            <form:errors path="email"
+                                                                cssClass="text-danger d-block mt-1" />
                                                         </div>
                                                         <div class="col-12">
-                                                            <label class="form-label fw-bold">Họ và tên</label>
+                                                            <label class="form-label fw-bold">Họ và tên <span
+                                                                    class="text-danger">*</span></label>
                                                             <form:input path="fullName" class="form-control p-2" />
+                                                            <form:errors path="fullName"
+                                                                cssClass="text-danger d-block mt-1" />
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <label class="form-label fw-bold">Số điện thoại</label>
+                                                            <label class="form-label fw-bold">Số điện thoại <span
+                                                                    class="text-danger">*</span></label>
                                                             <form:input path="phone" class="form-control p-2" />
+                                                            <form:errors path="phone"
+                                                                cssClass="text-danger d-block mt-1" />
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <label class="form-label fw-bold">Ngày sinh</label>
+                                                            <label class="form-label fw-bold">Ngày sinh <span
+                                                                    class="text-danger">*</span></label>
                                                             <form:input type="date" path="dateOfBirth"
                                                                 class="form-control p-2" />
+                                                            <form:errors path="dateOfBirth"
+                                                                cssClass="text-danger d-block mt-1" />
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <label class="form-label fw-bold">Giới tính</label>
+                                                            <label class="form-label fw-bold">Giới tính <span
+                                                                    class="text-danger">*</span></label>
                                                             <form:select path="gender" class="form-select p-2">
-                                                                <form:option value="Nam">Nam</form:option>
-                                                                <form:option value="Nữ">Nữ</form:option>
-                                                                <form:option value="Khác">Khác</form:option>
+                                                                <form:option value="Male">Nam</form:option>
+                                                                <form:option value="Female">Nữ</form:option>
+                                                                <form:option value="Other">Khác</form:option>
                                                             </form:select>
+                                                            <form:errors path="gender"
+                                                                cssClass="text-danger d-block mt-1" />
                                                         </div>
                                                         <div class="col-12">
-                                                            <label class="form-label fw-bold">Địa chỉ</label>
+                                                            <label class="form-label fw-bold">Địa chỉ <span
+                                                                    class="text-danger">*</span></label>
                                                             <form:input path="address" class="form-control p-2"
                                                                 rows="3" />
+                                                            <form:errors path="address"
+                                                                cssClass="text-danger d-block mt-1" />
                                                         </div>
                                                         <div class="col-12 text-end mt-4">
                                                             <button type="submit"
