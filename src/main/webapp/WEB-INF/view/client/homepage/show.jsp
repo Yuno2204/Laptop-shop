@@ -199,6 +199,7 @@
                         animation: fire-flicker 1.5s infinite;
                     }
                 </style>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
             </head>
 
             <body>
@@ -261,11 +262,22 @@
                                                     class="m-0">
                                                     <input type="hidden" name="${_csrf.parameterName}"
                                                         value="${_csrf.token}" />
-                                                    <button type="submit"
-                                                        class="btn btn-outline-danger w-100 rounded-pill fw-bold"
-                                                        style="font-size: 13px;">
-                                                        Thêm vào giỏ hàng
-                                                    </button>
+                                                    <c:choose>
+                                                        <c:when test="${empty sessionScope.email}">
+                                                            <button type="button" onclick="requireLogin()"
+                                                                class="btn btn-outline-danger w-100 rounded-pill fw-bold"
+                                                                style="font-size: 13px;">
+                                                                Thêm vào giỏ hàng
+                                                            </button>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <button type="submit"
+                                                                class="btn btn-outline-danger w-100 rounded-pill fw-bold"
+                                                                style="font-size: 13px;">
+                                                                Thêm vào giỏ hàng
+                                                            </button>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </form>
                                             </div>
                                         </div>
@@ -288,7 +300,118 @@
                 <script src="/client/lib/waypoints/waypoints.min.js"></script>
                 <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
                 <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+
                 <script src="/client/js/main.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+                <script>
+                    function requireLogin() {
+                        // Cấu hình hiển thị cho Toastr
+                        toastr.options = {
+                            "closeButton": true,
+                            "progressBar": true,
+                            "positionClass": "toast-top-right",
+                            "timeOut": "2000" // Hiển thị 2 giây
+                        };
+
+                        // Hiện thông báo cảnh báo
+                        toastr.warning('Bạn cần phải đăng nhập để mua hàng!', 'Thông báo');
+
+                        // Chờ 2 giây để người dùng đọc thông báo rồi mới tự động chuyển hướng sang trang đăng nhập
+                        setTimeout(function () {
+                            window.location.href = '/login';
+                        }, 2000);
+                    }
+                </script>
+                <script>
+                    $(document).ready(function () {
+                        // Bắt sự kiện submit của tất cả các form thêm vào giỏ hàng
+                        $('form[action^="/add-product-to-cart"]').on('submit', function (e) {
+                            e.preventDefault(); // Chặn hành vi chuyển trang mặc định của trình duyệt
+
+                            var form = $(this);
+                            var url = form.attr('action');
+
+                            // Lấy token CSRF để vượt qua bảo mật của Spring Security
+                            var csrfToken = form.find('input[name="_csrf"]').val();
+                            var csrfParam = form.find('input[name="_csrf"]').attr('name');
+                            var data = {};
+                            data[csrfParam] = csrfToken;
+
+                            // Tạo hiệu ứng vô hiệu hóa nút trong lúc chờ xử lý
+                            var submitBtn = form.find('button[type="submit"]');
+                            var originalText = submitBtn.html();
+                            submitBtn.prop('disabled', true).text('Đang xử lý...');
+
+                            // Gửi dữ liệu ngầm (AJAX)
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                data: data,
+                                success: function () {
+                                    var cartBadge = $('.cart-badge');
+                                    var currentSum = parseInt(cartBadge.text().trim()) || 0;
+                                    cartBadge.text(currentSum + 1);
+                                    // Cấu hình hiển thị Toastr
+                                    toastr.options = {
+                                        "closeButton": true,
+                                        "progressBar": true,
+                                        "positionClass": "toast-top-right",
+                                        "timeOut": "2000"
+                                    };
+                                    // Hiển thị thông báo thành công
+                                    toastr.success('Thêm sản phẩm vào giỏ hàng thành công!', 'Thành công');
+
+                                    // Khôi phục lại nút bấm
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                },
+                                error: function () {
+                                    toastr.error('Có lỗi xảy ra, vui lòng thử lại!', 'Thất bại');
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                }
+                            });
+                        });
+                    });
+                </script>
+                <c:if test="${sessionScope.showWelcome == true}">
+                    <script>
+                        $(document).ready(function () {
+                            toastr.options = {
+                                "closeButton": true,
+                                "progressBar": true,
+                                "positionClass": "toast-top-right",
+                                "timeOut": "3000" // Hiển thị 3 giây
+                            };
+
+                            // Có thể dùng ${sessionScope.fullName} để gọi tên người dùng cho thân thiện
+                            toastr.success('Chào mừng ${sessionScope.fullName} đến với cửa hàng LongHang Mobile!', 'Đăng nhập thành công');
+                        });
+                    </script>
+
+                    <%-- Lệnh này rất quan trọng: Xóa biến session ngay sau khi dùng để ấn F5 không bị hiện lại thông
+                        báo --%>
+                        <c:remove var="showWelcome" scope="session" />
+                </c:if>
+                <c:if test="${param.logout == 'success'}">
+                    <script>
+                        $(document).ready(function () {
+                            toastr.options = {
+                                "closeButton": true,
+                                "progressBar": true,
+                                "positionClass": "toast-top-right",
+                                "timeOut": "3000"
+                            };
+
+                            toastr.info('Bạn đã đăng xuất thành công. Hẹn gặp lại!', 'Thông báo');
+
+                            // Xử lý làm sạch URL (xóa chữ ?logout=success) để trông chuyên nghiệp hơn
+                            if (window.history.replaceState) {
+                                const url = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                                window.history.replaceState({ path: url }, '', url);
+                            }
+                        });
+                    </script>
+                </c:if>
             </body>
 
             </html>

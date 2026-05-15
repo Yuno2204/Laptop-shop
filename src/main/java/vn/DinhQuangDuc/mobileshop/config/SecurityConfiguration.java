@@ -61,6 +61,7 @@ public class SecurityConfiguration {
                                                                 DispatcherType.INCLUDE)
                                                 .permitAll()
                                                 .requestMatchers("/", "/login", "/register", "/product/**",
+                                                                "/products/**", "/about/**",
                                                                 "/client/**", "/account/**", "/policy/**", "/css/**",
                                                                 "/js/**",
                                                                 "/images/**")
@@ -78,7 +79,10 @@ public class SecurityConfiguration {
                                                 .invalidSessionUrl("/logout?expired")
                                                 .maximumSessions(1)
                                                 .maxSessionsPreventsLogin(false))
-                                .logout(logout -> logout.deleteCookies("JSESSIONID").invalidateHttpSession(true))
+                                .logout(logout -> logout
+                                                .deleteCookies("JSESSIONID")
+                                                .invalidateHttpSession(true)
+                                                .logoutSuccessUrl("/?logout=success")) // Thêm chữ =success vào đây
                                 .rememberMe(remember -> remember
                                                 .key("mobile-shop-remember-me-key-123456")
                                                 .rememberMeParameter("remember-me")

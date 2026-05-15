@@ -83,6 +83,7 @@
                         }
                     }
                 </style>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
             </head>
 
             <body>
@@ -173,11 +174,22 @@
                                         </div>
                                     </div>
 
-                                    <button type="submit"
-                                        class="btn border border-secondary rounded-pill px-4 py-2 text-primary fw-bold shadow-sm"
-                                        ${product.quantity==0 ? 'disabled' : '' }>
-                                        <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
-                                    </button>
+                                    <c:choose>
+                                        <c:when test="${empty sessionScope.email}">
+                                            <button type="button" onclick="requireLogin()"
+                                                class="btn border border-secondary rounded-pill px-4 py-2 text-primary fw-bold shadow-sm"
+                                                ${product.quantity==0 ? 'disabled' : '' }>
+                                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
+                                            </button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button type="submit"
+                                                class="btn border border-secondary rounded-pill px-4 py-2 text-primary fw-bold shadow-sm"
+                                                ${product.quantity==0 ? 'disabled' : '' }>
+                                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng
+                                            </button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </form>
 
@@ -360,10 +372,20 @@
                                         data: data
                                     });
                                 }
+                                var cartBadge = $('.cart-badge');
+                                var currentSum = parseInt(cartBadge.text().trim()) || 0;
+                                cartBadge.text(currentSum + qty);
+                                // Bỏ lệnh chuyển trang, hiển thị popup thông báo Toastr
+                                toastr.options = {
+                                    "closeButton": true,
+                                    "progressBar": true,
+                                    "positionClass": "toast-top-right",
+                                    "timeOut": "2000"
+                                };
+                                toastr.success('Thêm sản phẩm vào giỏ hàng thành công!', 'Thành công');
 
-                                // Sau khi gọi đủ số lần, mới cho đi tới giỏ hàng
-                                window.location.href = '/cart';
-
+                                // Khôi phục lại trạng thái ban đầu cho nút bấm
+                                submitBtn.prop('disabled', false).html(originalText);
                             } catch (error) {
                                 console.error("Lỗi:", error);
                                 alert('Có lỗi xảy ra!');
@@ -371,6 +393,27 @@
                             }
                         });
                     });
+                </script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+                <script>
+                    function requireLogin() {
+                        // Cấu hình hiển thị cho Toastr
+                        toastr.options = {
+                            "closeButton": true,
+                            "progressBar": true,
+                            "positionClass": "toast-top-right",
+                            "timeOut": "2000" // Hiển thị 2 giây
+                        };
+
+                        // Hiện thông báo cảnh báo
+                        toastr.warning('Bạn cần phải đăng nhập để mua hàng!', 'Thông báo');
+
+                        // Chờ 2 giây để người dùng đọc thông báo rồi mới tự động chuyển hướng sang trang đăng nhập
+                        setTimeout(function () {
+                            window.location.href = '/login';
+                        }, 2000);
+                    }
                 </script>
             </body>
 

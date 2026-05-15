@@ -49,6 +49,7 @@
                         letter-spacing: 0.5px;
                     }
                 </style>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
             </head>
 
             <body>
@@ -264,6 +265,60 @@
                         </div>
                     </div>
                 </div>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+                <script>
+                    $(document).ready(function () {
+                        // 1. Lấy ID sản phẩm đưa vào form khi người dùng bấm nút thùng rác
+                        $('.btn-delete-cart').on('click', function () {
+                            var cartDetailId = $(this).attr('data-cart-detail-id');
+                            $('#delete-cart-form').attr('action', '/delete-cart-product/' + cartDetailId);
+                        });
+
+                        // 2. Chặn sự kiện submit form xóa mặc định
+                        $('#delete-cart-form').on('submit', function (e) {
+                            e.preventDefault(); // Chặn load lại trang lập tức
+
+                            var form = $(this);
+                            var url = form.attr('action');
+                            var data = form.serialize(); // Tự động lấy cả _csrf token
+
+                            // Hiệu ứng vô hiệu hóa nút xóa trong Modal
+                            var submitBtn = form.find('button[type="submit"]');
+                            var originalText = submitBtn.html();
+                            submitBtn.prop('disabled', true).text('Đang xóa...');
+
+                            // Gửi dữ liệu xóa ngầm xuống Backend
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                data: data,
+                                success: function () {
+                                    // Đóng modal xác nhận
+                                    $('#confirmDeleteModal').modal('hide');
+
+                                    // Cấu hình và hiển thị thông báo Toastr
+                                    toastr.options = {
+                                        "closeButton": true,
+                                        "progressBar": true,
+                                        "positionClass": "toast-top-right",
+                                        "timeOut": "1500" // Hiển thị thông báo trong 1.5 giây
+                                    };
+                                    toastr.success('Xóa sản phẩm thành công!', 'Thành công');
+
+                                    // Sau 1.5 giây thì tự động tải lại trang để cập nhật lại danh sách và tổng tiền
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 1500);
+                                },
+                                error: function () {
+                                    toastr.error('Có lỗi xảy ra, không thể xóa sản phẩm!', 'Thất bại');
+                                    submitBtn.prop('disabled', false).html(originalText);
+                                }
+                            });
+                        });
+                    });
+                </script>
             </body>
 
             </html>
