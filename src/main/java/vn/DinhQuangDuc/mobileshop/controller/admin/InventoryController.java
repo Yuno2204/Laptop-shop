@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+// Thêm 2 thư viện này
+import jakarta.servlet.http.HttpServletResponse;
+import vn.DinhQuangDuc.mobileshop.service.ExcelExportService;
+
 import vn.DinhQuangDuc.mobileshop.domain.Product;
 import vn.DinhQuangDuc.mobileshop.service.ProductService;
 
@@ -18,9 +23,12 @@ import java.util.List;
 public class InventoryController {
 
     private final ProductService productService;
+    private final ExcelExportService excelExportService; // Khai báo thêm ExcelExportService
 
-    public InventoryController(ProductService productService) {
+    // Cập nhật constructor
+    public InventoryController(ProductService productService, ExcelExportService excelExportService) {
         this.productService = productService;
+        this.excelExportService = excelExportService;
     }
 
     @GetMapping("/admin/inventory")
@@ -37,21 +45,25 @@ public class InventoryController {
         return "admin/inventory/show";
     }
 
+    @GetMapping("/admin/inventory/export")
+    public void exportInventoryToExcel(HttpServletResponse response) throws Exception {
+        // Lấy toàn bộ sản phẩm từ DB
+        List<Product> products = this.productService.getAllProducts();
+
+        // Gọi hàm exportProducts đã có sẵn trong ExcelExportService
+        this.excelExportService.exportProducts(response, products);
+    }
+
     // Xử lý khi Admin nhập thêm số lượng hàng (Nhập kho)
     @PostMapping("/admin/inventory/import")
     public String importStock(@RequestParam("productId") long productId,
             @RequestParam("addQuantity") int addQuantity,
             RedirectAttributes redirectAttributes) {
 
-        // SỬ DỤNG HÀM ĐÃ CÓ SẴN CỦA BẠN TẠI ĐÂY
         Product currentProduct = this.productService.getProductByID(productId);
 
-        // Kiểm tra xem có tìm thấy sản phẩm không (khác null)
         if (currentProduct != null) {
-            // Cộng dồn số lượng mới vào số lượng cũ
             currentProduct.setQuantity(currentProduct.getQuantity() + addQuantity);
-
-            // Lưu lại (Bạn thay "handleSaveProduct" bằng tên hàm lưu Product của bạn nhé)
             this.productService.handleSaveProduct(currentProduct);
 
             redirectAttributes.addFlashAttribute("successMsg",

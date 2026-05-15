@@ -59,8 +59,14 @@
                                 </c:if>
 
                                 <div class="card mb-4 shadow-sm border-0">
-                                    <div class="card-header bg-white py-3 fw-bold">
-                                        <i class="fas fa-boxes me-1 text-primary"></i> Danh sách hàng hóa trong kho
+                                    <div
+                                        class="card-header bg-white py-3 fw-bold d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fas fa-boxes me-1 text-primary"></i> Danh sách hàng hóa trong kho
+                                        </div>
+                                        <a href="/admin/inventory/export" class="btn btn-success btn-sm fw-bold">
+                                            <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                                        </a>
                                     </div>
                                     <div class="card-body">
                                         <div class="table-responsive">
@@ -93,7 +99,7 @@
                                                                             class="badge bg-danger rounded-pill px-3 py-2">Hết
                                                                             hàng</span>
                                                                     </c:when>
-                                                                    <c:when test="${product.quantity <= 5}">
+                                                                    <c:when test="${product.quantity <= 30}">
                                                                         <span
                                                                             class="badge bg-warning text-dark rounded-pill px-3 py-2">Sắp
                                                                             hết hàng</span>
