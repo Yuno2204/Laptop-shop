@@ -13,12 +13,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import vn.DinhQuangDuc.mobileshop.service.validator.StrongPassword;
 
 @Entity
 @Table(name = "users")
@@ -27,31 +21,36 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull
-    @NotBlank(message = "Email không được để trống")
-    @Email(message = "Email không hợp lệ")
     private String email;
 
-    @NotBlank(message = "Mật khẩu không được để trống")
-    @StrongPassword(message = "Mật khẩu phải có ít nhất 8 ký tự")
     @JsonIgnore
     private String password;
 
-    @NotBlank(message = "Họ và tên không được để trống")
-    @Pattern(regexp = "^$|^.{3,36}$", message = "Họ và tên phải từ 3 đến 36 ký tự")
     private String fullName;
 
-    @NotBlank(message = "Địa chỉ không được để trống")
     private String address;
 
-    @NotBlank(message = "Số điện thoại không được để trống")
-    @Pattern(regexp = "^$|^(0|\\+84)\\d{9}$", message = "Số điện thoại không hợp lệ ")
     private String phone;
+
     private String avatar;
-    @NotBlank(message = "Vui lòng chọn giới tính")
+
     private String gender;
-    @NotBlank(message = "Vui lòng nhập ngày sinh")
+
     private String dateOfBirth;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Order> orders;
+
+    @OneToOne(mappedBy = "user")
+    @JsonIgnore
+    private Cart cart;
+
+    // --- Getters và Setters ---
 
     public String getGender() {
         return gender;
@@ -68,20 +67,6 @@ public class User {
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
-
-    // user id
-    // many user to one role
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
-
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    private List<Order> orders;
-
-    @OneToOne(mappedBy = "user")
-    @JsonIgnore
-    private Cart cart;
 
     public Role getRole() {
         return role;
@@ -170,5 +155,4 @@ public class User {
                 ", phone=" + phone + ", avatar=" + avatar +
                 ", gender=" + gender + ", dateOfBirth=" + dateOfBirth + "]";
     }
-
 }

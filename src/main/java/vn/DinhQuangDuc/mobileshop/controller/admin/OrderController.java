@@ -34,50 +34,41 @@ public class OrderController {
         this.excelExportService = excelExportService;
     }
 
-    // Hiển thị danh sách đơn hàng
-    // Hiển thị danh sách đơn hàng
     @GetMapping("/admin/order")
     public String getDashboard(Model model,
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate,
-            @RequestParam(value = "page", defaultValue = "1") int page) { // Thêm tham số page
+            @RequestParam(value = "page", defaultValue = "1") int page) {
 
         List<Order> orders;
         List<Order> revenueOrders;
 
-        // 1. Lấy TẤT CẢ đơn hàng
         orders = this.orderService.fetchAllOrders();
 
         if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
             LocalDateTime start = LocalDate.parse(startDate).atStartOfDay();
             LocalDateTime end = LocalDate.parse(endDate).atTime(23, 59, 59);
 
-            // Lọc danh sách tổng theo ngày tạo
             orders = orders.stream()
                     .filter(o -> o.getOrderDate() != null
                             && !o.getOrderDate().isBefore(start)
                             && !o.getOrderDate().isAfter(end))
                     .collect(Collectors.toList());
 
-            // 2. Doanh thu:
             revenueOrders = this.orderService.getRevenueByDate(start, end);
         } else {
-            // Doanh thu mặc định
             revenueOrders = orders.stream()
                     .filter(o -> "DELIVERED".equals(o.getStatus()) || "SUCCESS".equals(o.getStatus()))
                     .collect(Collectors.toList());
         }
 
-        // Sắp xếp đơn mới nhất lên đầu
         orders.sort((o1, o2) -> Long.compare(o2.getId(), o1.getId()));
         revenueOrders.sort((o1, o2) -> Long.compare(o2.getId(), o1.getId()));
 
-        // Tính tổng tiền dựa trên TẤT CẢ đơn hàng lọc được (Giữ nguyên không đổi)
         double totalRevenue = revenueOrders.stream()
                 .mapToDouble(Order::getTotalPrice)
                 .sum();
 
-        // --- BẮT ĐẦU CẮT 10 DÒNG CHO BẢNG HIỂN THỊ ĐƠN HÀNG ---
         int pageSize = 10;
         int totalItems = orders.size();
         int totalPages = (int) Math.ceil((double) totalItems / pageSize);
@@ -91,14 +82,11 @@ public class OrderController {
         int startItem = (page - 1) * pageSize;
         int endItem = Math.min(startItem + pageSize, totalItems);
         List<Order> pagedOrders = orders.subList(startItem, endItem);
-        // --------------------------------------------------------
 
-        // Trả về View
-        model.addAttribute("orders", pagedOrders); // Chỉ truyền 10 đơn lên giao diện
-        model.addAttribute("revenueOrders", revenueOrders); // Bảng doanh thu giữ nguyên
+        model.addAttribute("orders", pagedOrders);
+        model.addAttribute("revenueOrders", revenueOrders);
         model.addAttribute("totalRevenue", totalRevenue);
 
-        // Gửi lại các biến lọc và trang
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         model.addAttribute("currentPage", page);
@@ -107,7 +95,6 @@ public class OrderController {
         return "admin/order/show";
     }
 
-    // Xem chi tiết đơn hàng
     @GetMapping("/admin/order/{id}")
     public String getOrderDetailPage(Model model, @PathVariable long id) {
         Optional<Order> orderOptional = this.orderService.fetchOrderById(id);
@@ -120,7 +107,6 @@ public class OrderController {
         return "admin/order/detail";
     }
 
-    // Lấy giao diện cập nhật trạng thái đơn hàng
     @GetMapping("/admin/order/update/{id}")
     public String getUpdateOrderPage(Model model, @PathVariable long id) {
         Optional<Order> currentOrder = this.orderService.fetchOrderById(id);
@@ -130,22 +116,25 @@ public class OrderController {
         return "admin/order/update";
     }
 
-    // Xử lý cập nhật trạng thái đơn hàng
     @PostMapping("/admin/order/update")
     public String postUpdateOrderPage(@ModelAttribute("newOrder") Order order) {
         this.orderService.updateOrder(order);
         return "redirect:/admin/order";
     }
 
-    // Lấy giao diện xác nhận xóa đơn hàng
     @GetMapping("/admin/order/delete/{id}")
     public String getDeleteOrderPage(Model model, @PathVariable long id) {
         model.addAttribute("id", id);
-        model.addAttribute("newOrder", new Order());
+
+        // SỬA LỖI: Cần tạo đối tượng và ép giá trị ID tĩnh vào thay vì truyền Order
+        // rỗng.
+        Order tempOrder = new Order();
+        tempOrder.setId(id);
+        model.addAttribute("newOrder", tempOrder);
+
         return "admin/order/delete";
     }
 
-    // Xử lý xóa đơn hàng
     @PostMapping("/admin/order/delete")
     public String postDeleteOrderPage(@ModelAttribute("newOrder") Order order) {
         this.orderService.deleteOrderById(order.getId());
@@ -174,7 +163,6 @@ public class OrderController {
                         o.getReceiverAddress(),
                         o.getTotalPrice(),
                         o.getStatus(),
-                        // Parse LocalDateTime sang String
                         o.getOrderDate() != null ? o.getOrderDate().format(formatter) : "",
                         o.getDeliveredDate() != null ? o.getDeliveredDate().format(formatter) : ""))
                 .collect(Collectors.toList());
@@ -194,9 +182,7 @@ public class OrderController {
     @GetMapping("/admin/order/export")
     public void exportOrdersToExcel(HttpServletResponse response) {
         try {
-            // Lấy toàn bộ đơn hàng
             List<Order> orders = this.orderService.fetchAllOrders();
-            // Xuất báo cáo Master-Detail (Kèm danh sách sản phẩm bên trong)
             this.excelExportService.exportOrders(response, orders);
         } catch (Exception e) {
             e.printStackTrace();

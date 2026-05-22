@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpSession;
 import vn.DinhQuangDuc.mobileshop.domain.Cart;
@@ -93,7 +94,6 @@ public class ProductService {
                     oldDetail.setQuantity(oldDetail.getQuantity() + 1);
                     this.cartDetailRepository.save(oldDetail);
                 }
-
             }
         }
     }
@@ -107,21 +107,16 @@ public class ProductService {
 
         if (cartDetailOptional.isPresent()) {
             CartDetail cartDetail = cartDetailOptional.get();
-
             Cart currentCart = cartDetail.getCart();
 
-            // delete cart-detail
             this.cartDetailRepository.deleteById(cartDetailId);
 
-            // update cart
             if (currentCart.getSum() > 1) {
-                // update current cart
                 int s = currentCart.getSum() - 1;
                 currentCart.setSum(s);
                 session.setAttribute("sum", s);
                 this.cartRepository.save(currentCart);
             } else {
-                // delete cart (sum = 1)
                 this.cartRepository.deleteById(currentCart.getId());
                 session.setAttribute("sum", 0);
             }
@@ -141,7 +136,7 @@ public class ProductService {
         }
     }
 
-    // Sửa kiểu trả về thành String
+    @Transactional
     public String handlePlaceOrder(User user, HttpSession session, String receiverName, String receiverAddress,
             String receiverPhone) {
         Cart cart = this.cartRepository.findByUser(user);
@@ -149,17 +144,13 @@ public class ProductService {
             List<CartDetail> cartDetails = cart.getCartDetails();
             if (cartDetails != null && !cartDetails.isEmpty()) {
 
-                // ================= BƯỚC BỔ SUNG: KIỂM TRA TỒN KHO =================
                 for (CartDetail cd : cartDetails) {
                     if (cd.getQuantity() > cd.getProduct().getQuantity()) {
-                        // Trả về thông báo lỗi nếu không đủ hàng
                         return "Sản phẩm [" + cd.getProduct().getName() + "] không đủ số lượng. Chỉ còn "
                                 + cd.getProduct().getQuantity() + " sản phẩm.";
                     }
                 }
-                // =================================================================
 
-                // Bước 1: Khởi tạo đối tượng Order
                 Order order = new Order();
                 order.setUser(user);
                 order.setReceiverName(receiverName);
@@ -173,10 +164,8 @@ public class ProductService {
                 order.setTotalPrice(totalPrice);
                 order.setOrderDate(LocalDateTime.now());
 
-                // Bước 2: Lưu Order trước để lấy ID
                 order = this.orderRepository.save(order);
 
-                // Bước 3: Tạo và lưu các OrderDetail
                 for (CartDetail cd : cartDetails) {
                     OrderDetail orderDetail = new OrderDetail();
                     orderDetail.setOrder(order);
@@ -184,32 +173,37 @@ public class ProductService {
                     orderDetail.setPrice((long) cd.getPrice());
                     orderDetail.setQuantity(cd.getQuantity());
                     this.orderDetailRepository.save(orderDetail);
-                    this.orderRepository.save(order);
 
-                    // ================= BƯỚC BỔ SUNG: TRỪ TỒN KHO =================
                     Product product = cd.getProduct();
                     long newQuantity = product.getQuantity() - cd.getQuantity();
                     product.setQuantity(newQuantity);
-                    this.productRepository.save(product); // Lưu lại số lượng mới
-                    // =============================================================
+                    this.productRepository.save(product);
                 }
 
-                // Bước 4: Xóa dữ liệu giỏ hàng cũ
                 for (CartDetail cd : cartDetails) {
                     this.cartDetailRepository.deleteById(cd.getId());
                 }
-                this.cartRepository.deleteById(cart.getId());
+
+                // SỬA LỖI: Cần xóa trắng collection trên bộ nhớ để JPA không cố gắng merge lại
+                // dữ liệu đã xóa
+                if (cart.getCartDetails() != null) {
+                    cart.getCartDetails().clear();
+                }
+
+                cart.setSum(0);
+                this.cartRepository.save(cart);
+
                 session.setAttribute("sum", 0);
+                session.removeAttribute("cart");
             }
         }
-        return null; // Trả về null nghĩa là đặt hàng thành công
+        return null;
     }
 
     public List<Product> searchProduct(String keyword) {
         return productRepository.searchByKeyword(keyword);
     }
 
-    // Lấy danh sách toàn bộ sản phẩm
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
@@ -219,8 +213,7 @@ public class ProductService {
                 : productRepository.searchByKeyword(keyword);
         return products.stream().map(p -> new ProductSearchDTO(
                 p.getId(), p.getName(), p.getPrice(), p.getQuantity(),
-                p.getFactory() // Truyền thêm factory
-        )).collect(Collectors.toList());
+                p.getFactory())).collect(Collectors.toList());
     }
 
     public Page<Product> fetchProductsWithPagination(Pageable pageable) {

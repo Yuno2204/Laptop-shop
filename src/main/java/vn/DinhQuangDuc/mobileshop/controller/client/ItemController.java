@@ -66,8 +66,7 @@ public class ItemController {
         }
 
         long userId = (long) session.getAttribute("id");
-        User currentUser = new User();
-        currentUser.setId(userId);
+        User currentUser = this.userService.getUserByID(userId);
 
         Cart cart = this.productService.fetchByUser(currentUser);
         List<CartDetail> cartDetails = cart == null ? new ArrayList<CartDetail>() : cart.getCartDetails();
@@ -100,16 +99,10 @@ public class ItemController {
             return "redirect:/login";
         }
 
-        // Lấy ID từ session
         long userId = (long) session.getAttribute("id");
-
-        // Gọi userService lấy thông tin User (Đã hết lỗi vì đã inject ở Bước 1)
         User currentUser = this.userService.getUserByID(userId);
-
-        // TRUYỀN DỮ LIỆU USER SANG TRANG CHECKOUT ĐỂ TỰ ĐỘNG ĐIỀN FORM
         model.addAttribute("user", currentUser);
 
-        // Xử lý giỏ hàng và tổng tiền
         Cart cart = this.productService.fetchByUser(currentUser);
         List<CartDetail> cartDetails = cart == null ? new ArrayList<>() : cart.getCartDetails();
 
@@ -145,10 +138,11 @@ public class ItemController {
         }
 
         long userId = (long) session.getAttribute("id");
-        User currentUser = new User();
-        currentUser.setId(userId);
 
-        // Gọi service xử lý đặt hàng (đã có logic kiểm tra tồn kho và trừ hàng)
+        // SỬA LỖI: Lấy trực tiếp Managed Entity của User từ database để tránh lỗi
+        // Detached Entity
+        User currentUser = this.userService.getUserByID(userId);
+
         String errorMsg = this.productService.handlePlaceOrder(currentUser, session, receiverName, receiverAddress,
                 receiverPhone);
 
@@ -173,8 +167,7 @@ public class ItemController {
         }
 
         long userId = (long) session.getAttribute("id");
-        User currentUser = new User();
-        currentUser.setId(userId);
+        User currentUser = this.userService.getUserByID(userId);
 
         List<Order> orders = this.orderService.fetchOrderByUser(currentUser);
         model.addAttribute("orders", orders);
@@ -192,7 +185,6 @@ public class ItemController {
         Optional<Order> orderOpt = this.orderService.fetchOrderById(id);
         if (orderOpt.isPresent()) {
             Order order = orderOpt.get();
-            // Bảo mật: Chỉ cho phép xem đơn hàng của chính mình
             if (order.getUser().getId() != userId) {
                 return "redirect:/order-history";
             }
@@ -202,7 +194,6 @@ public class ItemController {
         return "redirect:/order-history";
     }
 
-    // 2. Xử lý cập nhật thông tin nhận hàng
     @PostMapping("/order-history/update")
     public String updateOrderInfo(HttpServletRequest request,
             @RequestParam("orderId") long orderId,
@@ -218,12 +209,11 @@ public class ItemController {
         Optional<Order> orderOpt = this.orderService.fetchOrderById(orderId);
         if (orderOpt.isPresent()) {
             Order order = orderOpt.get();
-            // Kểm tra điều kiện: Đúng chủ đơn hàng VÀ trạng thái phải là PENDING
             if (order.getUser().getId() == userId && "PENDING".equals(order.getStatus())) {
                 order.setReceiverName(receiverName);
                 order.setReceiverAddress(receiverAddress);
                 order.setReceiverPhone(receiverPhone);
-                this.orderService.saveOrder(order); // Lưu thay đổi
+                this.orderService.saveOrder(order);
                 ra.addFlashAttribute("success", "Cập nhật thông tin nhận hàng thành công!");
             } else {
                 ra.addFlashAttribute("error", "Đơn hàng đang giao, không thể cập nhật!");
@@ -232,7 +222,6 @@ public class ItemController {
         return "redirect:/order-history/" + orderId;
     }
 
-    // 3. Xử lý Hủy đơn hàng
     @PostMapping("/order-history/cancel")
     public String cancelOrder(HttpServletRequest request, @RequestParam("orderId") long orderId,
             RedirectAttributes ra) {
@@ -245,7 +234,6 @@ public class ItemController {
         if (orderOpt.isPresent()) {
             Order order = orderOpt.get();
             if (order.getUser().getId() == userId && "PENDING".equals(order.getStatus())) {
-                // Tái sử dụng logic updateOrder của Admin (tự động hoàn kho)
                 Order tempOrder = new Order();
                 tempOrder.setId(orderId);
                 tempOrder.setStatus("CANCELLED");
@@ -262,7 +250,6 @@ public class ItemController {
     @GetMapping("/api/order/status/{id}")
     @ResponseBody
     public Order getOrderStatus(@PathVariable Long id) {
-        // Trả về đối tượng Order dưới dạng JSON
         return this.orderService.fetchOrderById(id).orElse(null);
     }
 }

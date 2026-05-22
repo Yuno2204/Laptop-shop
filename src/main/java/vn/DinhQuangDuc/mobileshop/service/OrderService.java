@@ -33,12 +33,10 @@ public class OrderService {
         this.productRepository = productRepository;
     }
 
-    // Lấy tất cả đơn hàng cho trang Admin
     public List<Order> fetchAllOrders() {
         return this.orderRepository.findAll();
     }
 
-    // Lấy chi tiết một đơn hàng theo ID
     public Optional<Order> fetchOrderById(long id) {
         return this.orderRepository.findById(id);
     }
@@ -55,7 +53,6 @@ public class OrderService {
                 return;
             }
 
-            // 1. XỬ LÝ TỒN KHO VÀ LƯỢT BÁN
             List<OrderDetail> details = currentOrder.getOrderDetails();
             for (OrderDetail cd : details) {
                 Product product = cd.getProduct();
@@ -87,7 +84,6 @@ public class OrderService {
                 this.productRepository.save(product);
             }
 
-            // 2. CẬP NHẬT THỜI GIAN
             LocalDateTime now = LocalDateTime.now();
             if ("SHIPPING".equals(newStatus)) {
                 currentOrder.setShippingDate(now);
@@ -108,6 +104,21 @@ public class OrderService {
         Optional<Order> orderOptional = this.fetchOrderById(id);
         if (orderOptional.isPresent()) {
             Order order = orderOptional.get();
+
+            // SỬA LỖI: Hoàn lại số lượng tồn kho nếu đơn hàng bị xóa cứng trực tiếp (mà
+            // chưa từng bị hủy)
+            if (!"CANCELLED".equals(order.getStatus())) {
+                List<OrderDetail> details = order.getOrderDetails();
+                for (OrderDetail cd : details) {
+                    Product product = cd.getProduct();
+                    product.setQuantity(product.getQuantity() + cd.getQuantity());
+                    if ("DELIVERED".equals(order.getStatus()) || "SUCCESS".equals(order.getStatus())) {
+                        product.setSold(product.getSold() - cd.getQuantity());
+                    }
+                    this.productRepository.save(product);
+                }
+            }
+
             List<OrderDetail> details = order.getOrderDetails();
             for (OrderDetail cd : details) {
                 this.orderDetailRepository.deleteById(cd.getId());
@@ -179,7 +190,6 @@ public class OrderService {
         }
     }
 
-    // 3. Hàm lấy danh sách doanh thu
     public List<Order> getRevenueByDate(LocalDateTime start, LocalDateTime end) {
         return orderRepository.findRevenueOrders(start, end);
     }
