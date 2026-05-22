@@ -63,10 +63,15 @@ public class SecurityConfiguration {
                                                 .requestMatchers("/", "/login", "/register", "/product/**",
                                                                 "/products/**", "/about/**",
                                                                 "/client/**", "/account/**", "/policy/**", "/css/**",
-                                                                "/js/**",
-                                                                "/images/**")
+                                                                "/js/**", "/images/**")
                                                 .permitAll()
+                                                .requestMatchers("/admin/product/**", "/admin/order/**",
+                                                                "/admin/inventory/**")
+                                                .hasAnyRole("ADMIN", "EMPLOYEE")
+                                                .requestMatchers("/admin/user/**").hasRole("ADMIN")
+                                                .requestMatchers("/admin", "/admin/").hasRole("ADMIN")
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
+
                                                 .anyRequest().authenticated())
                                 .formLogin(formLogin -> formLogin
                                                 .loginPage("/login")

@@ -31,6 +31,9 @@
                                 onclick="document.getElementById('logoutForm').submit();">
                                 <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
                             </a>
+                            <a class="dropdown-item text" href="/">
+                                <i class="fas fa-sign-out-alt me-2"></i>Về trang chủ
+                            </a>
                         </li>
                     </ul>
                 </li>

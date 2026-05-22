@@ -101,6 +101,7 @@
                             <label class="form-label">Vai trò <span class="text-danger">*</span>:</label>
                             <form:select class="form-select" path="role.name">
                               <form:option value="USER">USER</form:option>
+                              <form:option value="EMPLOYEE">EMPLOYEE</form:option>
                               <form:option value="ADMIN">ADMIN</form:option>
                             </form:select>
                           </div>
