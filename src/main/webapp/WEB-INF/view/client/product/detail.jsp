@@ -148,7 +148,8 @@
 
                             <hr class="mb-4">
 
-                            <form action="/add-product-to-cart/${product.id}" method="post" class="mb-4">
+                            <form id="addToCartForm" action="/add-product-to-cart/${product.id}" method="post"
+                                class="mb-4">
                                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                                 <input type="hidden" id="max-stock-val" value="${product.quantity}" />
@@ -313,13 +314,27 @@
 
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
                 <script src="/client/js/main.js"></script>
 
                 <script>
-                    $(document).ready(function () {
-                        var quantityInput = $('#quantity-input');
+                    // Hàm yêu cầu đăng nhập
+                    function requireLogin() {
+                        toastr.options = {
+                            "closeButton": true,
+                            "progressBar": true,
+                            "positionClass": "toast-top-right",
+                            "timeOut": "2000"
+                        };
+                        toastr.warning('Bạn cần phải đăng nhập để mua hàng!', 'Thông báo');
+                        setTimeout(function () {
+                            window.location.href = '/login';
+                        }, 2000);
+                    }
 
-                        // Lấy số lượng tồn kho từ thẻ input ẩn
+                    $(document).ready(function () {
+                        // --- LOGIC TĂNG GIẢM SỐ LƯỢNG ---
+                        var quantityInput = $('#quantity-input');
                         var maxStockInput = $('#max-stock-val').val();
                         var maxStock = parseInt(maxStockInput) || 0;
 
@@ -338,27 +353,52 @@
                                 quantityInput.val(currentVal - 1);
                             }
                         });
+
+                        // --- LOGIC AJAX ADD TO CART ---
+                        $('#addToCartForm').on('submit', function (e) {
+                            e.preventDefault(); // Chặn hành vi chuyển trang mặc định của form
+
+                            var form = $(this);
+                            var url = form.attr('action');
+                            var btn = form.find('button[type="submit"]');
+                            var originalHtml = btn.html();
+
+                            // Vô hiệu hóa nút và hiện trạng thái Loading
+                            btn.prop('disabled', true);
+                            btn.html('<i class="fas fa-spinner fa-spin me-2 text-primary"></i> Đang thêm hàng...');
+
+                            $.ajax({
+                                type: 'POST',
+                                url: url,
+                                data: form.serialize(),
+                                dataType: 'json',
+                                success: function (response) {
+                                    if (response.success) {
+                                        toastr.success(response.message, 'Thành công');
+
+                                        // Tự động update số lượng giỏ hàng trên Header
+                                        if (response.cartCount !== undefined) {
+                                            $('.cart-badge').text(response.cartCount);
+                                        }
+                                    } else {
+                                        toastr.error(response.message, 'Cảnh báo');
+                                    }
+                                },
+                                error: function (xhr) {
+                                    if (xhr.status === 401) {
+                                        requireLogin();
+                                    } else {
+                                        toastr.error('Hệ thống đang bận. Vui lòng thử lại sau!', 'Lỗi');
+                                    }
+                                },
+                                complete: function () {
+                                    // Chạy ở mọi trường hợp (Thành công hay Lỗi) để mở khóa UI
+                                    btn.prop('disabled', false);
+                                    btn.html(originalHtml);
+                                }
+                            });
+                        });
                     });
-                </script>
-
-                <script>
-                    function requireLogin() {
-                        // Cấu hình hiển thị cho Toastr
-                        toastr.options = {
-                            "closeButton": true,
-                            "progressBar": true,
-                            "positionClass": "toast-top-right",
-                            "timeOut": "2000" // Hiển thị 2 giây
-                        };
-
-                        // Hiện thông báo cảnh báo
-                        toastr.warning('Bạn cần phải đăng nhập để mua hàng!', 'Thông báo');
-
-                        // Chờ 2 giây để người dùng đọc thông báo rồi mới tự động chuyển hướng sang trang đăng nhập
-                        setTimeout(function () {
-                            window.location.href = '/login';
-                        }, 2000);
-                    }
                 </script>
             </body>
 

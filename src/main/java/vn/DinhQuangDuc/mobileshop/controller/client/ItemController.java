@@ -81,7 +81,8 @@ public class ItemController {
             }
 
             // Nếu Service thành công
-            int currentSum = (int) session.getAttribute("sum"); // Đã cập nhật đúng số loại sp
+            Object sumObj = session.getAttribute("sum");
+            int currentSum = sumObj != null ? (int) sumObj : 0;// Đã cập nhật đúng số loại sp
             response.put("success", true);
             response.put("message", "Thêm sản phẩm vào giỏ hàng thành công!");
             response.put("cartCount", currentSum);
