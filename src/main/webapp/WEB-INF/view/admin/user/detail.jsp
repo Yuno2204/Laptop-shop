@@ -47,7 +47,16 @@
                           <li class="list-group-item">ID: ${user.id}</li>
                           <li class="list-group-item">Email: ${user.email}</li>
                           <li class="list-group-item">Họ và tên: ${user.fullName}</li>
-                          <li class="list-group-item">Giới tính: ${user.gender}</li>
+                          <li class="list-group-item">Giới tính:
+                            <c:choose>
+                              <c:when test="${user.gender == 'Male' || user.gender == 'MALE' || user.gender == 'male'}">
+                                Nam</c:when>
+                              <c:when
+                                test="${user.gender == 'Female' || user.gender == 'FEMALE' || user.gender == 'female'}">
+                                Nữ</c:when>
+                              <c:otherwise>Khác</c:otherwise>
+                            </c:choose>
+                          </li>
                           <li class="list-group-item">Ngày sinh: ${user.dateOfBirth}</li>
                           <li class="list-group-item">Số điện thoại: ${user.phone}</li>
                           <li class="list-group-item">Địa chỉ: ${user.address}</li>

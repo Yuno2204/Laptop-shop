@@ -67,6 +67,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>ID</th>
+                                                            <th>Hình ảnh</th>
                                                             <th>Tên sản phẩm</th>
                                                             <th>Giá sản phẩm</th>
                                                             <th>Số lượng</th>
@@ -78,6 +79,20 @@
                                                         <c:forEach var="product" items="${products}">
                                                             <tr>
                                                                 <th>${product.id}</th>
+                                                                <td>
+                                                                    <c:choose>
+                                                                        <c:when test="${not empty product.image}">
+                                                                            <img src="/images/product/${product.image}"
+                                                                                alt="img"
+                                                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <img src="/images/avatar/avatar.jpg"
+                                                                                alt="default"
+                                                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </td>
                                                                 <td>${product.name}</td>
                                                                 <td>
                                                                     <fmt:formatNumber type="number"

@@ -74,13 +74,14 @@ public class ProductController {
     @PostMapping("/admin/product/create")
     public String createProduct(@Valid @ModelAttribute("newProduct") ProductDTO productDTO,
             BindingResult bindingResult,
+            @RequestParam(value = "imagesFile", required = false) MultipartFile file, // Bổ sung tham số nhận file
             Model model) {
-        // 1. Nếu form bị lỗi định dạng (Validation thất bại), trả về lại trang tạo mới
+        // 1. Nếu form bị lỗi định dạng
         if (bindingResult.hasErrors()) {
             return "admin/product/create";
         }
 
-        // 2. Nếu dữ liệu an toàn, tiến hành copy thủ công từ DTO sang Entity
+        // 2. Nếu dữ liệu an toàn, tiến hành copy thủ công
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
@@ -98,9 +99,15 @@ public class ProductController {
         product.setBattery(productDTO.getBattery());
         product.setFastCharge(productDTO.getFastCharge());
 
-        // Giữ nguyên logic xử lý upload ảnh nếu có...
+        // --- ĐOẠN CODE XỬ LÝ UPLOAD ẢNH BỔ SUNG ---
+        if (file != null && !file.isEmpty()) {
+            // Tham số "product" chính là tên thư mục con: static/images/product
+            String image = this.uploadService.handleSaveUploadFile(file, "product");
+            product.setImage(image); // Lưu tên ảnh vào thực thể
+        }
+        // ------------------------------------------
 
-        // 3. Lưu xuống Database (Lúc này hàm save sẽ chạy mượt mà không văng Exception)
+        // 3. Lưu xuống Database
         this.productService.handleSaveProduct(product);
 
         return "redirect:/admin/product";
@@ -124,19 +131,19 @@ public class ProductController {
     @PostMapping("/admin/product/update")
     public String postUpdateProduct(@Valid @ModelAttribute("newProduct") ProductDTO productDTO,
             BindingResult bindingResult,
+            @RequestParam(value = "imagesFile", required = false) MultipartFile file, // 1. Bổ sung nhận file ảnh
             Model model) {
 
-        // BƯỚC 1: Validate từ form. Nếu có lỗi (như để trống tên, sai định dạng
-        // pin...), trả về ngay lập tức
+        // BƯỚC 1: Validate form
         if (bindingResult.hasErrors()) {
-            return "admin/product/update"; // Giữ nguyên form kèm thông báo lỗi màu đỏ
+            return "admin/product/update";
         }
 
-        // BƯỚC 2: Nếu hợp lệ, lấy đối tượng Product thực tế từ Database lên
+        // BƯỚC 2: Lấy sản phẩm hiện tại từ Database
         Product currentProduct = this.productService.getProductByID(productDTO.getId());
 
         if (currentProduct != null) {
-            // BƯỚC 3: Cập nhật dữ liệu từ DTO sang Entity thực tế
+            // BƯỚC 3: Cập nhật dữ liệu text
             currentProduct.setName(productDTO.getName());
             currentProduct.setPrice(productDTO.getPrice());
             currentProduct.setDetailDesc(productDTO.getDetailDesc());
@@ -153,11 +160,18 @@ public class ProductController {
             currentProduct.setBattery(productDTO.getBattery());
             currentProduct.setFastCharge(productDTO.getFastCharge());
 
-            // (Bạn có thể giữ nguyên đoạn code xử lý Upload file ảnh ở đây nếu người dùng
-            // có chọn ảnh mới)
+            // --- BƯỚC 4: XỬ LÝ ẢNH MỚI ---
+            // Nếu người dùng CÓ CHỌN ảnh mới
+            if (file != null && !file.isEmpty()) {
+                String img = this.uploadService.handleSaveUploadFile(file, "product");
+                currentProduct.setImage(img); // Ghi đè tên ảnh mới
+            }
+            // LƯU Ý: Nếu file rỗng (không chọn ảnh mới), điều kiện if phía trên sẽ bị bỏ
+            // qua.
+            // Biến currentProduct vẫn giữ nguyên giá trị image cũ lấy từ Database. Không lo
+            // mất ảnh!
 
-            // BƯỚC 4: Lưu xuống cơ sở dữ liệu. Quá trình này không còn bị Exception chặn
-            // lại nữa.
+            // BƯỚC 5: Lưu xuống DB
             this.productService.handleSaveProduct(currentProduct);
         }
 

@@ -72,11 +72,17 @@
                                                     <li class="list-group-item">
                                                         Ảnh:
                                                         <br />
-                                                        <c:if test="${not empty product.image}">
-                                                            <img src="/images/product/${product.image}"
-                                                                alt="${product.name}"
-                                                                style="max-width: 300px; max-height: 300px; margin-top: 10px;" />
-                                                        </c:if>
+                                                        <c:choose>
+                                                            <c:when test="${not empty product.image}">
+                                                                <img src="/images/product/${product.image}"
+                                                                    alt="${product.name}"
+                                                                    style="max-width: 300px; max-height: 300px; margin-top: 10px; border-radius: 5px;" />
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <img src="/images/avatar/avatar.jpg" alt="default-image"
+                                                                    style="max-width: 300px; max-height: 300px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc;" />
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </li>
                                                 </ul>
                                             </div>
