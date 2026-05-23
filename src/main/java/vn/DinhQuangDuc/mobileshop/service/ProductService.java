@@ -138,35 +138,43 @@ public class ProductService {
 
     @Transactional
     public String handlePlaceOrder(User user, HttpSession session, String receiverName, String receiverAddress,
-            String receiverPhone) {
+            String receiverPhone, List<Long> selectedCartDetailIds) { // Bổ sung tham số List<Long>
         Cart cart = this.cartRepository.findByUser(user);
         if (cart != null) {
             List<CartDetail> cartDetails = cart.getCartDetails();
             if (cartDetails != null && !cartDetails.isEmpty()) {
 
-                for (CartDetail cd : cartDetails) {
+                // 1. Chỉ lấy những CartDetail được khách chọn
+                List<CartDetail> selectedDetails = cartDetails.stream()
+                        .filter(cd -> selectedCartDetailIds.contains(cd.getId()))
+                        .collect(Collectors.toList());
+
+                // 2. Validate số lượng tồn kho (Chỉ validate những sp đang mua)
+                for (CartDetail cd : selectedDetails) {
                     if (cd.getQuantity() > cd.getProduct().getQuantity()) {
                         return "Sản phẩm [" + cd.getProduct().getName() + "] không đủ số lượng. Chỉ còn "
                                 + cd.getProduct().getQuantity() + " sản phẩm.";
                     }
                 }
 
+                // 3. Tạo Order
                 Order order = new Order();
                 order.setUser(user);
                 order.setReceiverName(receiverName);
                 order.setReceiverAddress(receiverAddress);
                 order.setReceiverPhone(receiverPhone);
                 order.setStatus("PENDING");
+
                 double totalPrice = 0;
-                for (CartDetail cd : cartDetails) {
+                for (CartDetail cd : selectedDetails) {
                     totalPrice += (cd.getPrice() * cd.getQuantity());
                 }
                 order.setTotalPrice(totalPrice);
                 order.setOrderDate(LocalDateTime.now());
-
                 order = this.orderRepository.save(order);
 
-                for (CartDetail cd : cartDetails) {
+                // 4. Lưu OrderDetail & Cập nhật tồn kho
+                for (CartDetail cd : selectedDetails) {
                     OrderDetail orderDetail = new OrderDetail();
                     orderDetail.setOrder(order);
                     orderDetail.setProduct(cd.getProduct());
@@ -180,21 +188,18 @@ public class ProductService {
                     this.productRepository.save(product);
                 }
 
-                for (CartDetail cd : cartDetails) {
+                // 5. Xóa các sản phẩm đã mua khỏi Database
+                for (CartDetail cd : selectedDetails) {
                     this.cartDetailRepository.deleteById(cd.getId());
                 }
 
-                // SỬA LỖI: Cần xóa trắng collection trên bộ nhớ để JPA không cố gắng merge lại
-                // dữ liệu đã xóa
-                if (cart.getCartDetails() != null) {
-                    cart.getCartDetails().clear();
-                }
-
-                cart.setSum(0);
+                // 6. Xóa các sản phẩm đã mua khỏi giỏ hàng Memory và tính lại tổng số lượng còn
+                // trong giỏ
+                cart.getCartDetails().removeIf(cd -> selectedCartDetailIds.contains(cd.getId()));
+                cart.setSum(cart.getCartDetails().size());
                 this.cartRepository.save(cart);
 
-                session.setAttribute("sum", 0);
-                session.removeAttribute("cart");
+                session.setAttribute("sum", cart.getSum());
             }
         }
         return null;

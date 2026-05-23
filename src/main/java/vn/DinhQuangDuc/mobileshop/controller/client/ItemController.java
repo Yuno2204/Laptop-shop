@@ -3,6 +3,7 @@ package vn.DinhQuangDuc.mobileshop.controller.client;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -99,6 +100,13 @@ public class ItemController {
             return "redirect:/login";
         }
 
+        // Lấy danh sách ID đã chọn từ Session
+        @SuppressWarnings("unchecked")
+        List<Long> selectedCartDetailIds = (List<Long>) session.getAttribute("selectedCartDetailIds");
+        if (selectedCartDetailIds == null || selectedCartDetailIds.isEmpty()) {
+            return "redirect:/cart"; // Quay lại giỏ hàng nếu lỗi mất session
+        }
+
         long userId = (long) session.getAttribute("id");
         User currentUser = this.userService.getUserByID(userId);
         model.addAttribute("user", currentUser);
@@ -106,21 +114,39 @@ public class ItemController {
         Cart cart = this.productService.fetchByUser(currentUser);
         List<CartDetail> cartDetails = cart == null ? new ArrayList<>() : cart.getCartDetails();
 
+        // CHỈ LỌC RA NHỮNG SẢN PHẨM MÀ KHÁCH HÀNG ĐÃ TICK CHỌN
+        List<CartDetail> selectedCartDetails = cartDetails.stream()
+                .filter(cd -> selectedCartDetailIds.contains(cd.getId()))
+                .collect(Collectors.toList());
+
         double totalPrice = 0;
-        for (CartDetail cd : cartDetails) {
+        for (CartDetail cd : selectedCartDetails) {
             totalPrice += cd.getPrice() * cd.getQuantity();
         }
 
-        model.addAttribute("cartDetails", cartDetails);
+        model.addAttribute("cartDetails", selectedCartDetails); // Đưa sang View danh sách đã lọc
         model.addAttribute("totalPrice", totalPrice);
 
         return "client/cart/checkout";
     }
 
     @PostMapping("/confirm-checkout")
-    public String confirmCheckout(@ModelAttribute("cart") Cart cart) {
+    public String confirmCheckout(@ModelAttribute("cart") Cart cart,
+            @RequestParam(value = "selectedCartDetailIds", required = false) List<Long> selectedCartDetailIds,
+            HttpServletRequest request) {
+        // Nếu không có sản phẩm nào được chọn (đề phòng user vượt qua được validate
+        // Frontend)
+        if (selectedCartDetailIds == null || selectedCartDetailIds.isEmpty()) {
+            return "redirect:/cart";
+        }
+
+        // Cập nhật lại số lượng mới nhất của toàn bộ giỏ hàng xuống DB
         List<CartDetail> cartDetails = cart == null ? new ArrayList<>() : cart.getCartDetails();
         this.productService.handleUpdateCartBeforeCheckout(cartDetails);
+
+        // Lưu danh sách ID các sản phẩm đã được tick chọn vào Session
+        request.getSession().setAttribute("selectedCartDetailIds", selectedCartDetailIds);
+
         return "redirect:/checkout";
     }
 
@@ -138,19 +164,26 @@ public class ItemController {
         }
 
         long userId = (long) session.getAttribute("id");
-
-        // SỬA LỖI: Lấy trực tiếp Managed Entity của User từ database để tránh lỗi
-        // Detached Entity
         User currentUser = this.userService.getUserByID(userId);
 
+        // Lấy lại danh sách ID đã chọn
+        @SuppressWarnings("unchecked")
+        List<Long> selectedCartDetailIds = (List<Long>) session.getAttribute("selectedCartDetailIds");
+        if (selectedCartDetailIds == null || selectedCartDetailIds.isEmpty()) {
+            return "redirect:/cart";
+        }
+
+        // Truyền thêm selectedCartDetailIds vào Service để xử lý
         String errorMsg = this.productService.handlePlaceOrder(currentUser, session, receiverName, receiverAddress,
-                receiverPhone);
+                receiverPhone, selectedCartDetailIds);
 
         if (errorMsg != null) {
             redirectAttributes.addFlashAttribute("error", errorMsg);
             return "redirect:/checkout";
         }
 
+        // Thành công thì xóa attribute này đi cho sạch Session
+        session.removeAttribute("selectedCartDetailIds");
         return "redirect:/thanks";
     }
 

@@ -25,7 +25,6 @@
                 <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
                 <link href="/client/css/bootstrap.min.css" rel="stylesheet">
-
                 <link href="/client/css/style.css" rel="stylesheet">
 
                 <style>
@@ -79,8 +78,8 @@
                                     <div class="col-md-6">
                                         <i class="fas fa-shopping-bag text-light mb-4" style="font-size: 8rem;"></i>
                                         <h2 class="mb-3">Giỏ hàng của bạn đang trống!</h2>
-                                        <p class="text-muted mb-4">Có vẻ như bạn chưa chọn được sản phẩm nào. Hãy khám
-                                            phá thêm các sản phẩm hấp dẫn của Mobileshop nhé.</p>
+                                        <p class="text-muted mb-4">Có vẻ như bạn chưa chọn được sản phẩm nào.
+                                            Hãy khám phá thêm các sản phẩm hấp dẫn của Mobileshop nhé.</p>
                                         <a href="/"
                                             class="btn btn-primary rounded-pill py-3 px-5 fw-bold text-white shadow-sm">
                                             <i class="fas fa-arrow-left me-2"></i> Tiếp tục mua sắm
@@ -96,6 +95,11 @@
                                             <table class="table table-hover table-cart align-middle mb-0">
                                                 <thead class="table-light">
                                                     <tr>
+                                                        <th scope="col" style="width: 50px;" class="text-center">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                id="selectAll"
+                                                                style="transform: scale(1.3); cursor: pointer;">
+                                                        </th>
                                                         <th scope="col" colspan="2">Sản phẩm</th>
                                                         <th scope="col" class="text-center">Đơn giá</th>
                                                         <th scope="col" class="text-center">Số lượng</th>
@@ -107,6 +111,12 @@
                                                     <c:forEach var="cartDetail" items="${cartDetails}"
                                                         varStatus="status">
                                                         <tr>
+                                                            <td class="text-center align-middle">
+                                                                <input class="form-check-input item-checkbox"
+                                                                    type="checkbox" value="${cartDetail.id}"
+                                                                    data-price="${cartDetail.price}"
+                                                                    style="transform: scale(1.3); cursor: pointer;">
+                                                            </td>
                                                             <td style="width: 100px;">
                                                                 <a href="/product/${cartDetail.product.id}">
                                                                     <img src="/images/product/${cartDetail.product.image}"
@@ -183,10 +193,8 @@
                                             <h4 class="mb-4 fw-bold">Thông tin Đơn hàng</h4>
 
                                             <div class="d-flex justify-content-between mb-3 text-muted">
-                                                <span>Tạm tính:</span>
-                                                <p class="mb-0 fw-bold text-dark" data-cart-total-price="${totalPrice}">
-                                                    <fmt:formatNumber type="number" value="${totalPrice}" /> đ
-                                                </p>
+                                                <span>Tạm tính (<span id="selected-count-display">0</span> SP):</span>
+                                                <p class="mb-0 fw-bold text-dark" id="sub-total-display">0 đ</p>
                                             </div>
                                             <div class="d-flex justify-content-between mb-3 text-muted">
                                                 <span>Phí vận chuyển:</span>
@@ -196,11 +204,8 @@
                                             <hr class="my-4">
 
                                             <div class="d-flex justify-content-between mb-4">
-                                                <h5 class="mb-0 fw-bold">Tổng số tiền:</h5>
-                                                <p class="mb-0 fw-bold text-primary h5"
-                                                    data-cart-total-price="${totalPrice}">
-                                                    <fmt:formatNumber type="number" value="${totalPrice}" /> đ
-                                                </p>
+                                                <h5 class="mb-0 fw-bold">Tổng thanh toán:</h5>
+                                                <p class="mb-0 fw-bold text-primary h5" id="total-price-display">0 đ</p>
                                             </div>
 
                                             <form action="/confirm-checkout" method="post" id="confirm-checkout-form">
@@ -241,7 +246,6 @@
                 <script src="/client/lib/waypoints/waypoints.min.js"></script>
                 <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
                 <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
-
                 <script src="/client/js/main.js"></script>
 
                 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
@@ -265,48 +269,115 @@
                         </div>
                     </div>
                 </div>
+
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
                 <script>
+                    // HÀM TÍNH TOÁN LẠI TỔNG TIỀN VÀ SỐ LƯỢNG SP ĐƯỢC CHỌN
+                    function calcSelectedTotal() {
+                        var total = 0;
+                        var count = 0;
+                        $('.item-checkbox:checked').each(function () {
+                            var id = $(this).val();
+                            var price = parseFloat($(this).attr('data-price'));
+                            var qty = parseInt($('input[data-cart-detail-id="' + id + '"]').val());
+                            total += price * qty;
+                            count += qty;
+                        });
+
+                        var formattedTotal = total.toLocaleString('vi-VN') + ' đ';
+                        $('#sub-total-display').text(formattedTotal);
+                        $('#total-price-display').text(formattedTotal);
+                        $('#selected-count-display').text(count);
+                    }
+
                     $(document).ready(function () {
-                        // 1. Lấy ID sản phẩm đưa vào form khi người dùng bấm nút thùng rác
+
+                        // 1. CHỨC NĂNG CHECKBOX VÀ TÍNH TIỀN THỜI GIAN THỰC
+                        $('#selectAll').change(function () {
+                            $('.item-checkbox').prop('checked', $(this).prop('checked'));
+                            calcSelectedTotal();
+                        });
+
+                        $('.item-checkbox').change(function () {
+                            if ($('.item-checkbox:checked').length === $('.item-checkbox').length) {
+                                $('#selectAll').prop('checked', true);
+                            } else {
+                                $('#selectAll').prop('checked', false);
+                            }
+                            calcSelectedTotal();
+                        });
+
+                        $('.btn-plus, .btn-minus').on('click', function () {
+                            setTimeout(function () {
+                                $('.quantity input[type="text"]').each(function () {
+                                    var id = $(this).attr('data-cart-detail-id');
+                                    var qty = $(this).val();
+                                    $('#hidden-qty-' + id).val(qty);
+                                });
+                                calcSelectedTotal();
+                            }, 100);
+                        });
+
+                        $('input[data-cart-detail-id]').on('change input', function () {
+                            var id = $(this).attr('data-cart-detail-id');
+                            $('#hidden-qty-' + id).val($(this).val());
+                            calcSelectedTotal();
+                        });
+
+                        // 2. CHỨC NĂNG VALIDATE VÀ GỬI FORM THANH TOÁN
+                        $('#btn-confirm-checkout').on('click', function (e) {
+                            e.preventDefault();
+                            var selectedIds = [];
+                            $('.item-checkbox:checked').each(function () {
+                                selectedIds.push($(this).val());
+                            });
+
+                            if (selectedIds.length === 0) {
+                                toastr.warning('Vui lòng chọn ít nhất một sản phẩm để đặt hàng!', 'Chưa chọn sản phẩm');
+                                return;
+                            }
+
+                            var form = $('#confirm-checkout-form');
+                            form.find('input[name="selectedCartDetailIds"]').remove();
+
+                            selectedIds.forEach(function (id) {
+                                form.append('<input type="hidden" name="selectedCartDetailIds" value="' + id + '">');
+                            });
+
+                            form.submit();
+                        });
+
+                        // 3. CHỨC NĂNG XÓA SẢN PHẨM QUA AJAX (GIỮ NGUYÊN TỪ CODE CŨ)
                         $('.btn-delete-cart').on('click', function () {
                             var cartDetailId = $(this).attr('data-cart-detail-id');
                             $('#delete-cart-form').attr('action', '/delete-cart-product/' + cartDetailId);
                         });
 
-                        // 2. Chặn sự kiện submit form xóa mặc định
                         $('#delete-cart-form').on('submit', function (e) {
-                            e.preventDefault(); // Chặn load lại trang lập tức
-
+                            e.preventDefault();
                             var form = $(this);
                             var url = form.attr('action');
-                            var data = form.serialize(); // Tự động lấy cả _csrf token
+                            var data = form.serialize();
 
-                            // Hiệu ứng vô hiệu hóa nút xóa trong Modal
                             var submitBtn = form.find('button[type="submit"]');
                             var originalText = submitBtn.html();
                             submitBtn.prop('disabled', true).text('Đang xóa...');
 
-                            // Gửi dữ liệu xóa ngầm xuống Backend
                             $.ajax({
                                 type: 'POST',
                                 url: url,
                                 data: data,
                                 success: function () {
-                                    // Đóng modal xác nhận
                                     $('#confirmDeleteModal').modal('hide');
-
-                                    // Cấu hình và hiển thị thông báo Toastr
                                     toastr.options = {
                                         "closeButton": true,
                                         "progressBar": true,
                                         "positionClass": "toast-top-right",
-                                        "timeOut": "1500" // Hiển thị thông báo trong 1.5 giây
+                                        "timeOut": "1500"
                                     };
                                     toastr.success('Xóa sản phẩm thành công!', 'Thành công');
 
-                                    // Sau 1.5 giây thì tự động tải lại trang để cập nhật lại danh sách và tổng tiền
                                     setTimeout(function () {
                                         window.location.reload();
                                     }, 1500);
