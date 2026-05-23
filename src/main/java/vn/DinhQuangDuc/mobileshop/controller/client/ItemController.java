@@ -324,4 +324,23 @@ public class ItemController {
     public Order getOrderStatus(@PathVariable Long id) {
         return this.orderService.fetchOrderById(id).orElse(null);
     }
+
+    @PostMapping("/api/update-cart-quantity")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateCartQuantityApi(
+            @RequestParam("cartDetailId") long cartDetailId,
+            @RequestParam("quantity") long quantity,
+            HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Vui lòng đăng nhập");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        Map<String, Object> result = this.productService.handleUpdateCartQuantity(cartDetailId, quantity);
+        return ResponseEntity.ok(result);
+    }
 }

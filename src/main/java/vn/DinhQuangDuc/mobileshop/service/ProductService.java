@@ -1,7 +1,9 @@
 package vn.DinhQuangDuc.mobileshop.service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -261,5 +263,36 @@ public class ProductService {
 
     public Page<Product> fetchProductsWithPagination(Pageable pageable) {
         return this.productRepository.findAll(pageable);
+    }
+
+    @Transactional
+    public Map<String, Object> handleUpdateCartQuantity(long cartDetailId, long requestedQty) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<CartDetail> optional = this.cartDetailRepository.findById(cartDetailId);
+
+        if (optional.isPresent()) {
+            CartDetail currentCartDetail = optional.get();
+            long maxStock = currentCartDetail.getProduct().getQuantity();
+
+            // Validate số lượng
+            if (requestedQty > maxStock) {
+                requestedQty = maxStock;
+                response.put("warning", "Sản phẩm chỉ còn tối đa " + maxStock + " sản phẩm!");
+            } else if (requestedQty < 1) {
+                requestedQty = 1;
+            }
+
+            // Lưu vào DB
+            currentCartDetail.setQuantity(requestedQty);
+            this.cartDetailRepository.save(currentCartDetail);
+
+            response.put("success", true);
+            response.put("newQuantity", requestedQty);
+            return response;
+        }
+
+        response.put("success", false);
+        response.put("message", "Không tìm thấy sản phẩm trong giỏ hàng");
+        return response;
     }
 }

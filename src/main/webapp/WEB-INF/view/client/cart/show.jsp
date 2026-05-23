@@ -59,7 +59,6 @@
             </head>
 
             <body>
-
                 <div id="spinner"
                     class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
                     <div class="spinner-grow text-primary" role="status"></div>
@@ -198,7 +197,6 @@
                                     <div class="col-lg-4">
                                         <div class="cart-summary-card bg-white p-4">
                                             <h4 class="mb-4 fw-bold">Thông tin Đơn hàng</h4>
-
                                             <div class="d-flex justify-content-between mb-3 text-muted">
                                                 <span>Tạm tính (<span id="selected-count-display">0</span> SP):</span>
                                                 <p class="mb-0 fw-bold text-dark" id="sub-total-display">0 đ</p>
@@ -207,9 +205,7 @@
                                                 <span>Phí vận chuyển:</span>
                                                 <p class="mb-0 fw-bold text-success">0 đ</p>
                                             </div>
-
                                             <hr class="my-4">
-
                                             <div class="d-flex justify-content-between mb-4">
                                                 <h5 class="mb-0 fw-bold">Tổng thanh toán:</h5>
                                                 <p class="mb-0 fw-bold text-primary h5" id="total-price-display">0 đ</p>
@@ -254,6 +250,7 @@
                 <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
                 <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
                 <script src="/client/js/main.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
                 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -277,8 +274,6 @@
                     </div>
                 </div>
 
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
                 <c:if test="${not empty error}">
                     <script>
                         $(document).ready(function () {
@@ -295,6 +290,11 @@
                 </c:if>
 
                 <script>
+                    // Hàm Format tiền tệ
+                    function formatMoney(value) {
+                        return parseFloat(value).toLocaleString('vi-VN') + ' đ';
+                    }
+
                     // HÀM TÍNH TOÁN LẠI TỔNG TIỀN VÀ SỐ LƯỢNG SP ĐƯỢC CHỌN
                     function calcSelectedTotal() {
                         var total = 0;
@@ -303,11 +303,12 @@
                             var id = $(this).val();
                             var price = parseFloat($(this).attr('data-price'));
                             var qty = parseInt($('input[data-cart-detail-id="' + id + '"]').val());
+
                             total += price * qty;
                             count += qty;
                         });
 
-                        var formattedTotal = total.toLocaleString('vi-VN') + ' đ';
+                        var formattedTotal = formatMoney(total);
                         $('#sub-total-display').text(formattedTotal);
                         $('#total-price-display').text(formattedTotal);
                         $('#selected-count-display').text(count);
@@ -326,14 +327,83 @@
                         }
                     }
 
-                    $(document).ready(function () {
+                    let updateTimer; // Biến dùng để debounce (chống spam click)
 
+                    // HÀM GỌI AJAX CẬP NHẬT DATABASE
+                    function updateQuantityAjax($input, newQty) {
+                        var cartDetailId = $input.attr('data-cart-detail-id');
+                        var maxStock = parseInt($input.attr('data-stock'));
+                        var price = parseFloat($input.attr('data-cart-detail-price'));
+
+                        // Validate nhanh ở Frontend
+                        if (newQty < 1) newQty = 1;
+                        if (newQty > maxStock) {
+                            toastr.warning('Trong kho chỉ còn tối đa ' + maxStock + ' sản phẩm!', 'Vượt tồn kho');
+                            newQty = maxStock;
+                        }
+
+                        // 1. Cập nhật UI ngay lập tức để user không bị khựng
+                        $input.val(newQty);
+                        $('#hidden-qty-' + cartDetailId).val(newQty);
+
+                        // Cập nhật lại Text hiển thị Thành Tiền cho từng item
+                        $('p[data-cart-detail-id="' + cartDetailId + '"]').text(formatMoney(price * newQty));
+
+                        calcSelectedTotal();
+                        checkMaxStockUI($input);
+
+                        // Tạm thời disable nút bấm để tránh double submit liên tiếp nếu mạng chậm
+                        var $btnGroup = $input.closest('.quantity');
+                        $btnGroup.find('button').prop('disabled', true);
+
+                        // 2. Clear timer cũ (nếu user bấm liên tục thì hủy request cũ)
+                        clearTimeout(updateTimer);
+
+                        // 3. Set timer mới (Debounce 500ms) - Ngừng click 0.5s mới Call Backend
+                        updateTimer = setTimeout(function () {
+                            $.ajax({
+                                url: '/api/update-cart-quantity',
+                                type: 'POST',
+                                data: {
+                                    cartDetailId: cartDetailId,
+                                    quantity: newQty,
+                                    '${_csrf.parameterName}': '${_csrf.token}' // Truyền tự động CSRF token từ JSP
+                                },
+                                success: function (res) {
+                                    if (res.success) {
+                                        // Nếu Backend phát hiện tồn kho thực tế đã thay đổi và ép lại số lượng
+                                        if (res.newQuantity !== newQty) {
+                                            $input.val(res.newQuantity);
+                                            $('#hidden-qty-' + cartDetailId).val(res.newQuantity);
+                                            $('p[data-cart-detail-id="' + cartDetailId + '"]').text(formatMoney(price * res.newQuantity));
+
+                                            calcSelectedTotal();
+                                            checkMaxStockUI($input);
+                                        }
+                                        if (res.warning) toastr.warning(res.warning);
+                                    } else {
+                                        toastr.error(res.message);
+                                    }
+                                },
+                                error: function () {
+                                    toastr.error("Đã xảy ra lỗi đồng bộ, vui lòng tải lại trang!");
+                                },
+                                complete: function () {
+                                    // Bật lại các nút bấm
+                                    $btnGroup.find('button').prop('disabled', false);
+                                    checkMaxStockUI($input);
+                                }
+                            });
+                        }, 500);
+                    }
+
+                    $(document).ready(function () {
                         // Chạy kiểm tra tồn kho ban đầu khi vừa load trang
                         $('input[data-cart-detail-id]').each(function () {
                             checkMaxStockUI($(this));
                         });
 
-                        // 1. CHỨC NĂNG CHECKBOX VÀ TÍNH TIỀN THỜI GIAN THỰC
+                        // ================== CHECKBOX XỬ LÝ ==================
                         $('#selectAll').change(function () {
                             $('.item-checkbox').prop('checked', $(this).prop('checked'));
                             calcSelectedTotal();
@@ -348,58 +418,34 @@
                             calcSelectedTotal();
                         });
 
-                        // 2. XỬ LÝ NHẬP SỐ LƯỢNG BẰNG TAY VÀ NÚT CỘNG/TRỪ (CÓ VALIDATE TỒN KHO)
-                        $('input[data-cart-detail-id]').on('change input', function () {
+                        // ================== EVENT TĂNG / GIẢM / NHẬP SỐ ==================
+                        // KHI USER NHẬP TRỰC TIẾP TỪ BÀN PHÍM
+                        $('input[data-cart-detail-id]').off('change keyup').on('change', function () {
                             var $input = $(this);
-                            var id = $input.attr('data-cart-detail-id');
-                            var maxStock = parseInt($input.attr('data-stock'));
                             var currentVal = parseInt($input.val());
+                            if (isNaN(currentVal) || currentVal < 1) currentVal = 1;
+                            updateQuantityAjax($input, currentVal);
+                        });
 
-                            if (isNaN(currentVal) || currentVal < 1) {
-                                currentVal = 1;
-                                $input.val(currentVal);
-                            } else if (currentVal > maxStock) {
-                                toastr.warning('Trong kho chỉ còn tối đa ' + maxStock + ' sản phẩm!', 'Vượt tồn kho');
-                                currentVal = maxStock;
-                                $input.val(currentVal);
+                        // CLICK NÚT CỘNG
+                        $('.btn-plus').off('click').on('click', function (e) {
+                            e.preventDefault();
+                            var $input = $(this).closest('.quantity').find('input[type="text"]');
+                            var currentVal = parseInt($input.val()) || 1;
+                            updateQuantityAjax($input, currentVal + 1);
+                        });
+
+                        // CLICK NÚT TRỪ
+                        $('.btn-minus').off('click').on('click', function (e) {
+                            e.preventDefault();
+                            var $input = $(this).closest('.quantity').find('input[type="text"]');
+                            var currentVal = parseInt($input.val()) || 1;
+                            if (currentVal > 1) {
+                                updateQuantityAjax($input, currentVal - 1);
                             }
-
-                            $('#hidden-qty-' + id).val(currentVal);
-                            calcSelectedTotal();
-                            checkMaxStockUI($input);
                         });
 
-                        $('.btn-plus').on('click', function () {
-                            var $input = $(this).closest('.quantity').find('input[type="text"]');
-                            setTimeout(function () {
-                                var currentVal = parseInt($input.val());
-                                var maxStock = parseInt($input.attr('data-stock'));
-
-                                if (currentVal > maxStock) {
-                                    toastr.warning('Trong kho chỉ còn tối đa ' + maxStock + ' sản phẩm!', 'Vượt tồn kho');
-                                    $input.val(maxStock);
-                                    currentVal = maxStock;
-                                }
-
-                                var id = $input.attr('data-cart-detail-id');
-                                $('#hidden-qty-' + id).val(currentVal);
-                                calcSelectedTotal();
-                                checkMaxStockUI($input);
-                            }, 50);
-                        });
-
-                        $('.btn-minus').on('click', function () {
-                            var $input = $(this).closest('.quantity').find('input[type="text"]');
-                            setTimeout(function () {
-                                var currentVal = parseInt($input.val());
-                                var id = $input.attr('data-cart-detail-id');
-                                $('#hidden-qty-' + id).val(currentVal);
-                                calcSelectedTotal();
-                                checkMaxStockUI($input);
-                            }, 50);
-                        });
-
-                        // 3. CHỨC NĂNG VALIDATE VÀ GỬI FORM THANH TOÁN
+                        // ================== GỬI FORM THANH TOÁN ==================
                         $('#btn-confirm-checkout').on('click', function (e) {
                             e.preventDefault();
                             var selectedIds = [];
@@ -422,7 +468,7 @@
                             form.submit();
                         });
 
-                        // 4. CHỨC NĂNG XÓA SẢN PHẨM QUA AJAX
+                        // ================== XÓA SẢN PHẨM KHỎI GIỎ ==================
                         $('.btn-delete-cart').on('click', function () {
                             var cartDetailId = $(this).attr('data-cart-detail-id');
                             $('#delete-cart-form').attr('action', '/delete-cart-product/' + cartDetailId);
@@ -451,7 +497,6 @@
                                         "timeOut": "1500"
                                     };
                                     toastr.success('Xóa sản phẩm thành công!', 'Thành công');
-
                                     setTimeout(function () {
                                         window.location.reload();
                                     }, 1500);
