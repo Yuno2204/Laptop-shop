@@ -64,37 +64,65 @@ public class ProductService {
         return this.productRepository.save(product);
     }
 
-    public void handleAddProductToCart(String email, Long productID, HttpSession session) {
+    @Transactional // Bắt buộc để đảm bảo tính toàn vẹn dữ liệu
+    public String handleAddProductToCart(String email, Long productID, HttpSession session, long quantity) {
         User user = this.userService.getUserByEmail(email);
-        if (user != null) {
-            Cart cart = this.cartRepository.findByUser(user);
-            if (cart == null) {
-                Cart otherCart = new Cart();
-                otherCart.setUser(user);
-                otherCart.setSum(0);
-                cart = this.cartRepository.save(otherCart);
-            }
-            Optional<Product> product = this.productRepository.findById(productID);
-            if (product.isPresent()) {
-                Product readlProduct = product.get();
-                CartDetail oldDetail = this.cartDetailRepository.findByCartAndProduct(
-                        cart, readlProduct);
-                if (oldDetail == null) {
-                    CartDetail cartDetail = new CartDetail();
-                    cartDetail.setCart(cart);
-                    cartDetail.setProduct(readlProduct);
-                    cartDetail.setPrice(readlProduct.getPrice());
-                    cartDetail.setQuantity(1);
-                    this.cartDetailRepository.save(cartDetail);
-                    int s = cart.getSum() + 1;
-                    cart.setSum(s);
-                    this.cartRepository.save(cart);
-                    session.setAttribute("sum", s);
+        if (user == null)
+            return "Vui lòng đăng nhập để mua hàng!";
+
+        // 1. CHUẨN HÓA CART: Đảm bảo User chỉ có 1 Cart duy nhất
+        Cart cart = this.cartRepository.findByUser(user);
+        if (cart == null) {
+            Cart newCart = new Cart();
+            newCart.setUser(user);
+            newCart.setSum(0); // Sum ở đây là SỐ LOẠI SẢN PHẨM KHÁC NHAU
+            cart = this.cartRepository.save(newCart);
+        }
+
+        Optional<Product> productOpt = this.productRepository.findById(productID);
+        if (productOpt.isPresent()) {
+            Product realProduct = productOpt.get();
+            CartDetail oldDetail = this.cartDetailRepository.findByCartAndProduct(cart, realProduct);
+
+            long currentQtyInCart = (oldDetail != null) ? oldDetail.getQuantity() : 0;
+            long requestedTotalQty = currentQtyInCart + quantity;
+
+            // 2. CHẶN VƯỢT TỒN KHO TỪ TRONG TRỨNG NƯỚC
+            if (requestedTotalQty > realProduct.getQuantity()) {
+                long remaining = realProduct.getQuantity() - currentQtyInCart;
+                if (remaining <= 0) {
+                    return "Sản phẩm đã đạt giới hạn tồn kho trong giỏ của bạn. Không thể thêm!";
                 } else {
-                    oldDetail.setQuantity(oldDetail.getQuantity() + 1);
-                    this.cartDetailRepository.save(oldDetail);
+                    return "Chỉ có thể thêm tối đa " + remaining + " sản phẩm nữa.";
                 }
             }
+
+            // 3. LOGIC XỬ LÝ CART ITEM (Không Duplicate)
+            if (oldDetail == null) {
+                // TRƯỜNG HỢP A: Sản phẩm MỚI HOÀN TOÀN -> Tạo CartDetail & TĂNG BADGE
+                CartDetail cartDetail = new CartDetail();
+                cartDetail.setCart(cart);
+                cartDetail.setProduct(realProduct);
+                cartDetail.setPrice(realProduct.getPrice());
+                cartDetail.setQuantity(quantity); // Set đúng quantity yêu cầu
+                this.cartDetailRepository.save(cartDetail);
+
+                int newSum = cart.getSum() + 1; // Chỉ tăng badge khi có sản phẩm loại mới
+                cart.setSum(newSum);
+                this.cartRepository.save(cart);
+
+                // Đồng bộ session cho giao diện hiện tại
+                session.setAttribute("sum", newSum);
+            } else {
+                // TRƯỜNG HỢP B: Đã có sản phẩm -> CHỈ UPDATE QUANTITY, KHÔNG TĂNG BADGE
+                oldDetail.setQuantity(requestedTotalQty);
+                this.cartDetailRepository.save(oldDetail);
+                // cart.getSum() giữ nguyên
+            }
+
+            return null; // Return null nghĩa là HOÀN TOÀN THÀNH CÔNG
+        } else {
+            return "Sản phẩm không tồn tại trên hệ thống!";
         }
     }
 
@@ -129,8 +157,18 @@ public class ProductService {
 
             if (optional.isPresent()) {
                 CartDetail currentCartDetail = optional.get();
-                currentCartDetail.setQuantity(cartDetail.getQuantity());
 
+                // KIỂM TRA BẢO MẬT: Bắt buộc ép về Max Stock nếu request cố tình gửi vượt
+                long maxStock = currentCartDetail.getProduct().getQuantity();
+                long requestedQty = cartDetail.getQuantity();
+
+                if (requestedQty > maxStock) {
+                    requestedQty = maxStock;
+                } else if (requestedQty < 1) {
+                    requestedQty = 1;
+                }
+
+                currentCartDetail.setQuantity(requestedQty);
                 this.cartDetailRepository.save(currentCartDetail);
             }
         }

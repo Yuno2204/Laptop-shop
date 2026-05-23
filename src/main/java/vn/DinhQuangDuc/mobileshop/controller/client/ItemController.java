@@ -1,10 +1,14 @@
 package vn.DinhQuangDuc.mobileshop.controller.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,15 +52,49 @@ public class ItemController {
     }
 
     @PostMapping("/add-product-to-cart/{id}")
-    public String addProductToCart(@PathVariable long id, HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("email") == null) {
-            return "redirect:/login";
-        }
+    @ResponseBody // Định nghĩa API trả về JSON
+    public ResponseEntity<Map<String, Object>> addProductToCartApi(
+            @PathVariable long id,
+            @RequestParam(value = "quantity", defaultValue = "1") long quantity,
+            HttpServletRequest request) {
 
-        String email = (String) session.getAttribute("email");
-        this.productService.handleAddProductToCart(email, id, session);
-        return "redirect:/";
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("email") == null) {
+                response.put("success", false);
+                response.put("message", "Vui lòng đăng nhập để mua hàng!");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+
+            String email = (String) session.getAttribute("email");
+
+            // Gọi Service - Chứa toàn bộ logic chuẩn
+            String errorMsg = this.productService.handleAddProductToCart(email, id, session, quantity);
+
+            if (errorMsg != null) {
+                // Nếu Service trả về chuỗi lỗi (vượt tồn kho...)
+                response.put("success", false);
+                response.put("message", errorMsg);
+                return ResponseEntity.ok(response); // Vẫn trả 200 OK để JS đọc JSON
+            }
+
+            // Nếu Service thành công
+            int currentSum = (int) session.getAttribute("sum"); // Đã cập nhật đúng số loại sp
+            response.put("success", true);
+            response.put("message", "Thêm sản phẩm vào giỏ hàng thành công!");
+            response.put("cartCount", currentSum);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            // Bắt TẤT CẢ exception (Duplicate Key, DB lock...) để không lọt HTML ra
+            // Frontend
+            response.put("success", false);
+            response.put("message", "Hệ thống đang bận. Vui lòng thử lại sau!");
+            return ResponseEntity.ok(response);
+        }
     }
 
     @GetMapping("/cart")

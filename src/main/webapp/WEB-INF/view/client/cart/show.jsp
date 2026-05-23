@@ -47,6 +47,13 @@
                         color: #6c757d;
                         letter-spacing: 0.5px;
                     }
+
+                    /* CSS khóa nút bấm khi vượt tồn kho */
+                    .disabled-btn {
+                        opacity: 0.4;
+                        cursor: not-allowed !important;
+                        pointer-events: none;
+                    }
                 </style>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
             </head>
@@ -78,8 +85,8 @@
                                     <div class="col-md-6">
                                         <i class="fas fa-shopping-bag text-light mb-4" style="font-size: 8rem;"></i>
                                         <h2 class="mb-3">Giỏ hàng của bạn đang trống!</h2>
-                                        <p class="text-muted mb-4">Có vẻ như bạn chưa chọn được sản phẩm nào.
-                                            Hãy khám phá thêm các sản phẩm hấp dẫn của Mobileshop nhé.</p>
+                                        <p class="text-muted mb-4">Có vẻ như bạn chưa chọn được sản phẩm nào. Hãy khám
+                                            phá thêm các sản phẩm hấp dẫn của Mobileshop nhé.</p>
                                         <a href="/"
                                             class="btn btn-primary rounded-pill py-3 px-5 fw-bold text-white shadow-sm">
                                             <i class="fas fa-arrow-left me-2"></i> Tiếp tục mua sắm
@@ -272,6 +279,21 @@
 
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+                <c:if test="${not empty error}">
+                    <script>
+                        $(document).ready(function () {
+                            toastr.error('${error}', 'Cảnh báo');
+                        });
+                    </script>
+                </c:if>
+                <c:if test="${not empty success}">
+                    <script>
+                        $(document).ready(function () {
+                            toastr.success('${success}', 'Thành công');
+                        });
+                    </script>
+                </c:if>
+
                 <script>
                     // HÀM TÍNH TOÁN LẠI TỔNG TIỀN VÀ SỐ LƯỢNG SP ĐƯỢC CHỌN
                     function calcSelectedTotal() {
@@ -291,7 +313,25 @@
                         $('#selected-count-display').text(count);
                     }
 
+                    // HÀM KIỂM TRA TỒN KHO VÀ UI NÚT CỘNG/TRỪ
+                    function checkMaxStockUI($input) {
+                        var maxStock = parseInt($input.attr('data-stock'));
+                        var currentVal = parseInt($input.val());
+                        var $btnPlus = $input.siblings('.input-group-btn').find('.btn-plus');
+
+                        if (currentVal >= maxStock) {
+                            $btnPlus.prop('disabled', true).addClass('disabled-btn');
+                        } else {
+                            $btnPlus.prop('disabled', false).removeClass('disabled-btn');
+                        }
+                    }
+
                     $(document).ready(function () {
+
+                        // Chạy kiểm tra tồn kho ban đầu khi vừa load trang
+                        $('input[data-cart-detail-id]').each(function () {
+                            checkMaxStockUI($(this));
+                        });
 
                         // 1. CHỨC NĂNG CHECKBOX VÀ TÍNH TIỀN THỜI GIAN THỰC
                         $('#selectAll').change(function () {
@@ -308,24 +348,58 @@
                             calcSelectedTotal();
                         });
 
-                        $('.btn-plus, .btn-minus').on('click', function () {
-                            setTimeout(function () {
-                                $('.quantity input[type="text"]').each(function () {
-                                    var id = $(this).attr('data-cart-detail-id');
-                                    var qty = $(this).val();
-                                    $('#hidden-qty-' + id).val(qty);
-                                });
-                                calcSelectedTotal();
-                            }, 100);
-                        });
-
+                        // 2. XỬ LÝ NHẬP SỐ LƯỢNG BẰNG TAY VÀ NÚT CỘNG/TRỪ (CÓ VALIDATE TỒN KHO)
                         $('input[data-cart-detail-id]').on('change input', function () {
-                            var id = $(this).attr('data-cart-detail-id');
-                            $('#hidden-qty-' + id).val($(this).val());
+                            var $input = $(this);
+                            var id = $input.attr('data-cart-detail-id');
+                            var maxStock = parseInt($input.attr('data-stock'));
+                            var currentVal = parseInt($input.val());
+
+                            if (isNaN(currentVal) || currentVal < 1) {
+                                currentVal = 1;
+                                $input.val(currentVal);
+                            } else if (currentVal > maxStock) {
+                                toastr.warning('Trong kho chỉ còn tối đa ' + maxStock + ' sản phẩm!', 'Vượt tồn kho');
+                                currentVal = maxStock;
+                                $input.val(currentVal);
+                            }
+
+                            $('#hidden-qty-' + id).val(currentVal);
                             calcSelectedTotal();
+                            checkMaxStockUI($input);
                         });
 
-                        // 2. CHỨC NĂNG VALIDATE VÀ GỬI FORM THANH TOÁN
+                        $('.btn-plus').on('click', function () {
+                            var $input = $(this).closest('.quantity').find('input[type="text"]');
+                            setTimeout(function () {
+                                var currentVal = parseInt($input.val());
+                                var maxStock = parseInt($input.attr('data-stock'));
+
+                                if (currentVal > maxStock) {
+                                    toastr.warning('Trong kho chỉ còn tối đa ' + maxStock + ' sản phẩm!', 'Vượt tồn kho');
+                                    $input.val(maxStock);
+                                    currentVal = maxStock;
+                                }
+
+                                var id = $input.attr('data-cart-detail-id');
+                                $('#hidden-qty-' + id).val(currentVal);
+                                calcSelectedTotal();
+                                checkMaxStockUI($input);
+                            }, 50);
+                        });
+
+                        $('.btn-minus').on('click', function () {
+                            var $input = $(this).closest('.quantity').find('input[type="text"]');
+                            setTimeout(function () {
+                                var currentVal = parseInt($input.val());
+                                var id = $input.attr('data-cart-detail-id');
+                                $('#hidden-qty-' + id).val(currentVal);
+                                calcSelectedTotal();
+                                checkMaxStockUI($input);
+                            }, 50);
+                        });
+
+                        // 3. CHỨC NĂNG VALIDATE VÀ GỬI FORM THANH TOÁN
                         $('#btn-confirm-checkout').on('click', function (e) {
                             e.preventDefault();
                             var selectedIds = [];
@@ -348,7 +422,7 @@
                             form.submit();
                         });
 
-                        // 3. CHỨC NĂNG XÓA SẢN PHẨM QUA AJAX (GIỮ NGUYÊN TỪ CODE CŨ)
+                        // 4. CHỨC NĂNG XÓA SẢN PHẨM QUA AJAX
                         $('.btn-delete-cart').on('click', function () {
                             var cartDetailId = $(this).attr('data-cart-detail-id');
                             $('#delete-cart-form').attr('action', '/delete-cart-product/' + cartDetailId);

@@ -340,61 +340,6 @@
                         });
                     });
                 </script>
-                <script>
-                    $(document).ready(function () {
-                        var quantityInput = $('#quantity-input');
-
-                        // CHẶN SỰ KIỆN SUBMIT CỦA FORM ĐỂ LÁCH LUẬT
-                        $('form[action^="/add-product-to-cart"]').on('submit', async function (e) {
-                            e.preventDefault(); // Dừng việc chuyển trang ngay lập tức
-
-                            var form = $(this);
-                            var url = form.attr('action');
-                            var qty = parseInt(quantityInput.val()) || 1; // Lấy con số cuối cùng sau khi bạn đã bấm tăng/giảm
-
-                            // Lấy token bảo mật CSRF
-                            var csrfToken = form.find('input[name="_csrf"]').val();
-                            var csrfParam = form.find('input[name="_csrf"]').attr('name');
-                            var data = {};
-                            data[csrfParam] = csrfToken;
-
-                            // Hiệu ứng nút bấm
-                            var submitBtn = form.find('button[type="submit"]');
-                            var originalText = submitBtn.html();
-                            submitBtn.prop('disabled', true).text('Đang thêm vào giỏ...');
-
-                            try {
-                                // Vòng lặp thần thánh: Backend nhận 1, thì mình gọi n lần
-                                for (let i = 0; i < qty; i++) {
-                                    await $.ajax({
-                                        type: 'POST',
-                                        url: url,
-                                        data: data
-                                    });
-                                }
-                                var cartBadge = $('.cart-badge');
-                                var currentSum = parseInt(cartBadge.text().trim()) || 0;
-                                cartBadge.text(currentSum + qty);
-                                // Bỏ lệnh chuyển trang, hiển thị popup thông báo Toastr
-                                toastr.options = {
-                                    "closeButton": true,
-                                    "progressBar": true,
-                                    "positionClass": "toast-top-right",
-                                    "timeOut": "2000"
-                                };
-                                toastr.success('Thêm sản phẩm vào giỏ hàng thành công!', 'Thành công');
-
-                                // Khôi phục lại trạng thái ban đầu cho nút bấm
-                                submitBtn.prop('disabled', false).html(originalText);
-                            } catch (error) {
-                                console.error("Lỗi:", error);
-                                alert('Có lỗi xảy ra!');
-                                submitBtn.prop('disabled', false).html(originalText);
-                            }
-                        });
-                    });
-                </script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
                 <script>
                     function requireLogin() {

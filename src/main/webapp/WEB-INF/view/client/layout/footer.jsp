@@ -37,7 +37,6 @@
                                     class="fas fa-angle-right me-2"></i>Giỏ hàng của tôi</a>
                             <a class="btn-link text-white-50 mb-2 text-decoration-none transition-all"
                                 href="/order-history"><i class="fas fa-angle-right me-2"></i>Lịch sử mua hàng</a>
-
                         </div>
                     </div>
 
@@ -51,8 +50,6 @@
                                     class="fas fa-envelope me-3 text-primary"></i>Dienthoailonghang@gmail.com</p>
                             <p class="mb-4 text-white-50"><i class="fas fa-phone-alt me-3 text-primary"></i>0826166996
                             </p>
-
-
                         </div>
                     </div>
                 </div>
@@ -76,3 +73,85 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var checkJquery = setInterval(function () {
+                    if (window.jQuery) {
+                        clearInterval(checkJquery);
+                        $(document).ready(function () {
+
+                            // Gỡ bỏ sự kiện submit cũ (nếu có) để chống duplicate request
+                            $(document).off('submit', 'form[action*="/add-product-to-cart"]');
+
+                            // Gắn sự kiện chuẩn
+                            $(document).on('submit', 'form[action*="/add-product-to-cart"]', function (e) {
+                                e.preventDefault();
+
+                                var form = $(this);
+                                var $btn = form.find('button[type="submit"]');
+
+                                // Nếu nút đang xử lý, chặn spam click
+                                if ($btn.prop('disabled') || $btn.hasClass('processing')) {
+                                    return false;
+                                }
+
+                                var originalText = $btn.html();
+
+                                // Đổi UI sang trạng thái Đang thêm
+                                $btn.addClass('processing');
+                                $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang thêm...');
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: form.attr('action'),
+                                    data: form.serialize(),
+                                    dataType: 'json',
+                                    success: function (response) {
+                                        if (typeof toastr !== 'undefined') toastr.clear();
+
+                                        if (response.success === true) {
+                                            // Update Badge UI
+                                            var $badge = $('.fa-shopping-bag, .fa-shopping-cart').siblings('.badge, .position-absolute');
+                                            if ($badge.length) {
+                                                $badge.text(response.cartCount);
+                                            }
+
+                                            if (typeof toastr !== 'undefined') {
+                                                toastr.success(response.message, 'Thành công');
+                                            }
+                                        } else {
+                                            // Lỗi: Vượt tồn kho
+                                            if (typeof toastr !== 'undefined') {
+                                                toastr.error(response.message, 'Từ chối');
+                                            }
+
+                                            if (response.message.includes('đạt giới hạn') || response.message.includes('không đủ')) {
+                                                $btn.prop('disabled', true).html('<i class="fa fa-ban"></i> Đã hết hàng');
+                                                return; // Giữ nguyên trạng thái khóa
+                                            }
+                                        }
+                                    },
+                                    error: function (xhr) {
+                                        if (typeof toastr !== 'undefined') toastr.clear();
+                                        if (xhr.status === 401) {
+                                            if (typeof toastr !== 'undefined') toastr.warning('Vui lòng đăng nhập!');
+                                            setTimeout(function () { window.location.href = '/login'; }, 1500);
+                                        } else {
+                                            if (typeof toastr !== 'undefined') toastr.error('Lỗi kết nối máy chủ!');
+                                        }
+                                    },
+                                    complete: function () {
+                                        // Phục hồi nút bấm nếu không bị khóa cứng (bởi lỗi tồn kho)
+                                        $btn.removeClass('processing');
+                                        if (!$btn.prop('disabled') || $btn.html().includes('Đang thêm')) {
+                                            $btn.prop('disabled', false).html(originalText);
+                                        }
+                                    }
+                                });
+                            });
+                        });
+                    }
+                }, 100);
+            });
+        </script>
