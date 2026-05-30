@@ -52,14 +52,13 @@ public class ItemController {
     }
 
     @PostMapping("/add-product-to-cart/{id}")
-    @ResponseBody // Định nghĩa API trả về JSON
+    @ResponseBody
     public ResponseEntity<Map<String, Object>> addProductToCartApi(
             @PathVariable long id,
             @RequestParam(value = "quantity", defaultValue = "1") long quantity,
             HttpServletRequest request) {
-
+        // [Giữ nguyên code hiện tại]
         Map<String, Object> response = new HashMap<>();
-
         try {
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("email") == null) {
@@ -69,29 +68,22 @@ public class ItemController {
             }
 
             String email = (String) session.getAttribute("email");
-
-            // Gọi Service - Chứa toàn bộ logic chuẩn
             String errorMsg = this.productService.handleAddProductToCart(email, id, session, quantity);
 
             if (errorMsg != null) {
-                // Nếu Service trả về chuỗi lỗi (vượt tồn kho...)
                 response.put("success", false);
                 response.put("message", errorMsg);
-                return ResponseEntity.ok(response); // Vẫn trả 200 OK để JS đọc JSON
+                return ResponseEntity.ok(response);
             }
 
-            // Nếu Service thành công
             Object sumObj = session.getAttribute("sum");
-            int currentSum = sumObj != null ? (int) sumObj : 0;// Đã cập nhật đúng số loại sp
+            int currentSum = sumObj != null ? (int) sumObj : 0;
             response.put("success", true);
             response.put("message", "Thêm sản phẩm vào giỏ hàng thành công!");
             response.put("cartCount", currentSum);
 
             return ResponseEntity.ok(response);
-
         } catch (Exception e) {
-            // Bắt TẤT CẢ exception (Duplicate Key, DB lock...) để không lọt HTML ra
-            // Frontend
             response.put("success", false);
             response.put("message", "Hệ thống đang bận. Vui lòng thử lại sau!");
             return ResponseEntity.ok(response);
@@ -99,7 +91,9 @@ public class ItemController {
     }
 
     @GetMapping("/cart")
-    public String getCartPage(Model model, HttpServletRequest request) {
+    public String getCartPage(Model model, HttpServletRequest request,
+            @RequestParam(value = "keyword", required = false) String keyword) { // Thêm param keyword
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null) {
             return "redirect:/login";
@@ -111,6 +105,15 @@ public class ItemController {
         Cart cart = this.productService.fetchByUser(currentUser);
         List<CartDetail> cartDetails = cart == null ? new ArrayList<CartDetail>() : cart.getCartDetails();
 
+        // LOGIC TÌM KIẾM SẢN PHẨM TRONG GIỎ HÀNG
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            String finalKeyword = keyword.trim().toLowerCase();
+            cartDetails = cartDetails.stream()
+                    .filter(cd -> cd.getProduct().getName().toLowerCase().contains(finalKeyword))
+                    .collect(Collectors.toList());
+            model.addAttribute("keyword", keyword.trim()); // Lưu lại trạng thái keyword cho giao diện
+        }
+
         double totalPrice = 0;
         for (CartDetail cd : cartDetails) {
             totalPrice += cd.getPrice() * cd.getQuantity();
@@ -118,32 +121,41 @@ public class ItemController {
 
         model.addAttribute("cartDetails", cartDetails);
         model.addAttribute("totalPrice", totalPrice);
-        model.addAttribute("cart", cart);
+        model.addAttribute("cart", cart); // cart.getCartDetails() vẫn giữ nguyên, không bị thay đổi trong DB
         return "client/cart/show";
     }
 
     @PostMapping("/delete-cart-product/{id}")
-    public String deleteCartDetail(@PathVariable long id, HttpServletRequest request) {
+    public String deleteCartDetail(@PathVariable long id, HttpServletRequest request,
+            @RequestParam(value = "keyword", required = false) String keyword) { // Thêm param keyword
+
         HttpSession session = request.getSession(false);
         if (session == null) {
             return "redirect:/login";
         }
         this.productService.handleRemoveCartDetail(id, session);
+
+        // Nếu đang ở trạng thái tìm kiếm, giữ nguyên query sau khi xóa
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return "redirect:/cart?keyword=" + keyword.trim();
+        }
         return "redirect:/cart";
     }
 
+    // Các phương thức khác: /checkout, /confirm-checkout, /place-order,
+    // order-history... giữ nguyên hoàn toàn
     @GetMapping("/checkout")
     public String getCheckOutPage(Model model, HttpServletRequest request) {
+        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null) {
             return "redirect:/login";
         }
 
-        // Lấy danh sách ID đã chọn từ Session
         @SuppressWarnings("unchecked")
         List<Long> selectedCartDetailIds = (List<Long>) session.getAttribute("selectedCartDetailIds");
         if (selectedCartDetailIds == null || selectedCartDetailIds.isEmpty()) {
-            return "redirect:/cart"; // Quay lại giỏ hàng nếu lỗi mất session
+            return "redirect:/cart";
         }
 
         long userId = (long) session.getAttribute("id");
@@ -153,7 +165,6 @@ public class ItemController {
         Cart cart = this.productService.fetchByUser(currentUser);
         List<CartDetail> cartDetails = cart == null ? new ArrayList<>() : cart.getCartDetails();
 
-        // CHỈ LỌC RA NHỮNG SẢN PHẨM MÀ KHÁCH HÀNG ĐÃ TICK CHỌN
         List<CartDetail> selectedCartDetails = cartDetails.stream()
                 .filter(cd -> selectedCartDetailIds.contains(cd.getId()))
                 .collect(Collectors.toList());
@@ -163,7 +174,7 @@ public class ItemController {
             totalPrice += cd.getPrice() * cd.getQuantity();
         }
 
-        model.addAttribute("cartDetails", selectedCartDetails); // Đưa sang View danh sách đã lọc
+        model.addAttribute("cartDetails", selectedCartDetails);
         model.addAttribute("totalPrice", totalPrice);
 
         return "client/cart/checkout";
@@ -173,19 +184,14 @@ public class ItemController {
     public String confirmCheckout(@ModelAttribute("cart") Cart cart,
             @RequestParam(value = "selectedCartDetailIds", required = false) List<Long> selectedCartDetailIds,
             HttpServletRequest request) {
-        // Nếu không có sản phẩm nào được chọn (đề phòng user vượt qua được validate
-        // Frontend)
+        // [Giữ nguyên code hiện tại]
         if (selectedCartDetailIds == null || selectedCartDetailIds.isEmpty()) {
             return "redirect:/cart";
         }
 
-        // Cập nhật lại số lượng mới nhất của toàn bộ giỏ hàng xuống DB
         List<CartDetail> cartDetails = cart == null ? new ArrayList<>() : cart.getCartDetails();
         this.productService.handleUpdateCartBeforeCheckout(cartDetails);
-
-        // Lưu danh sách ID các sản phẩm đã được tick chọn vào Session
         request.getSession().setAttribute("selectedCartDetailIds", selectedCartDetailIds);
-
         return "redirect:/checkout";
     }
 
@@ -196,23 +202,19 @@ public class ItemController {
             @RequestParam("receiverAddress") String receiverAddress,
             @RequestParam("receiverPhone") String receiverPhone,
             RedirectAttributes redirectAttributes) {
-
+        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("id") == null) {
+        if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
-        }
 
         long userId = (long) session.getAttribute("id");
         User currentUser = this.userService.getUserByID(userId);
 
-        // Lấy lại danh sách ID đã chọn
         @SuppressWarnings("unchecked")
         List<Long> selectedCartDetailIds = (List<Long>) session.getAttribute("selectedCartDetailIds");
-        if (selectedCartDetailIds == null || selectedCartDetailIds.isEmpty()) {
+        if (selectedCartDetailIds == null || selectedCartDetailIds.isEmpty())
             return "redirect:/cart";
-        }
 
-        // Truyền thêm selectedCartDetailIds vào Service để xử lý
         String errorMsg = this.productService.handlePlaceOrder(currentUser, session, receiverName, receiverAddress,
                 receiverPhone, selectedCartDetailIds);
 
@@ -221,7 +223,6 @@ public class ItemController {
             return "redirect:/checkout";
         }
 
-        // Thành công thì xóa attribute này đi cho sạch Session
         session.removeAttribute("selectedCartDetailIds");
         return "redirect:/thanks";
     }
@@ -233,22 +234,22 @@ public class ItemController {
 
     @GetMapping("/order-history")
     public String getOrderHistoryPage(Model model, HttpServletRequest request) {
+        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("id") == null) {
+        if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
-        }
 
         long userId = (long) session.getAttribute("id");
         User currentUser = this.userService.getUserByID(userId);
 
         List<Order> orders = this.orderService.fetchOrderByUser(currentUser);
         model.addAttribute("orders", orders);
-
         return "client/cart/order-history";
     }
 
     @GetMapping("/order-history/{id}")
     public String getOrderDetailPage(Model model, HttpServletRequest request, @PathVariable long id) {
+        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
@@ -257,9 +258,8 @@ public class ItemController {
         Optional<Order> orderOpt = this.orderService.fetchOrderById(id);
         if (orderOpt.isPresent()) {
             Order order = orderOpt.get();
-            if (order.getUser().getId() != userId) {
+            if (order.getUser().getId() != userId)
                 return "redirect:/order-history";
-            }
             model.addAttribute("order", order);
             return "client/cart/order-detail";
         }
@@ -273,6 +273,7 @@ public class ItemController {
             @RequestParam("receiverAddress") String receiverAddress,
             @RequestParam("receiverPhone") String receiverPhone,
             RedirectAttributes ra) {
+        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
@@ -297,6 +298,7 @@ public class ItemController {
     @PostMapping("/order-history/cancel")
     public String cancelOrder(HttpServletRequest request, @RequestParam("orderId") long orderId,
             RedirectAttributes ra) {
+        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
@@ -310,7 +312,6 @@ public class ItemController {
                 tempOrder.setId(orderId);
                 tempOrder.setStatus("CANCELLED");
                 this.orderService.updateOrder(tempOrder);
-
                 ra.addFlashAttribute("success", "Hủy đơn hàng thành công! Số lượng sản phẩm đã được hoàn lại kho.");
             } else {
                 ra.addFlashAttribute("error", "Không thể hủy đơn hàng lúc này!");
@@ -331,7 +332,7 @@ public class ItemController {
             @RequestParam("cartDetailId") long cartDetailId,
             @RequestParam("quantity") long quantity,
             HttpServletRequest request) {
-
+        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null) {
             Map<String, Object> error = new HashMap<>();
