@@ -58,7 +58,7 @@
                     width: 100%;
                 }
 
-                /* Icon Giỏ Hàng */
+                /* Icon Giỏ Hàng & Chuông Thông Báo */
                 .cart-icon-wrapper {
                     color: #333;
                     transition: all 0.3s;
@@ -77,7 +77,7 @@
                     box-shadow: 0 2px 5px rgba(211, 47, 47, 0.4);
                 }
 
-                /* User Dropdown */
+                /* User & Notification Dropdown */
                 .user-dropdown-menu {
                     border-radius: 16px;
                     border: none;
@@ -154,15 +154,37 @@
                         </div>
                     </div>
 
-                    <div class="d-flex align-items-center mt-3 mt-xl-0 gap-4">
+                    <div class="d-flex align-items-center mt-3 mt-xl-0 gap-3">
                         <c:choose>
                             <c:when test="${not empty pageContext.request.remoteUser}">
 
-                                <a href="/cart" class="position-relative cart-icon-wrapper">
+                                <div class="dropdown">
+                                    <a href="#"
+                                        class="cart-icon-wrapper d-inline-flex align-items-center justify-content-center position-relative text-decoration-none"
+                                        id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                        style="width: 44px; height: 44px;">
+                                        <i class="fa fa-bell fa-2x"></i>
+                                        <span id="notificationBadge"
+                                            class="position-absolute rounded-circle d-flex align-items-center justify-content-center bg-danger text-white d-none"
+                                            style="top: 0px; right: 0px; height: 22px; min-width: 22px; font-size: 0.75rem; font-weight: bold; box-shadow: 0 2px 5px rgba(211, 47, 47, 0.4); padding: 0 4px;">
+                                            0
+                                        </span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end p-2 user-dropdown-menu"
+                                        aria-labelledby="notificationDropdown" id="notificationList"
+                                        style="width: 350px; max-height: 400px; overflow-y: auto;">
+                                        <li><span class="dropdown-item text-center text-muted">Đang tải thông
+                                                báo...</span></li>
+                                    </ul>
+                                </div>
+
+                                <a href="/cart"
+                                    class="cart-icon-wrapper d-inline-flex align-items-center justify-content-center position-relative text-decoration-none"
+                                    style="width: 44px; height: 44px;">
                                     <i class="fa fa-shopping-cart fa-2x"></i>
                                     <span
-                                        class="position-absolute rounded-circle d-flex align-items-center justify-content-center cart-badge px-1"
-                                        style="top: -6px; right: -10px; height: 22px; min-width: 22px;">
+                                        class="position-absolute rounded-circle d-flex align-items-center justify-content-center cart-badge"
+                                        style="top: 0px; right: 0px; height: 22px; min-width: 22px; padding: 0 4px;">
                                         ${not empty sessionScope.sum ? sessionScope.sum : 0}
                                     </span>
                                 </a>
@@ -214,17 +236,26 @@
                                                 <i class="fas fa-box-open me-2 text-primary"></i> Đơn hàng của tôi
                                             </a>
                                         </li>
+
                                         <sec:authorize access="hasRole('ADMIN')">
-                                            <a href="/admin" class="dropdown-item">
-                                                <i class="fas fa-user-cog me-2"></i> Trang quản trị Admin
-                                            </a>
+                                            <li>
+                                                <a href="/admin"
+                                                    class="dropdown-item dropdown-item-custom rounded mt-1">
+                                                    <i class="fas fa-user-shield me-2 text-warning"></i> Trang quản trị
+                                                    Admin
+                                                </a>
+                                            </li>
                                         </sec:authorize>
 
                                         <sec:authorize access="hasRole('EMPLOYEE')">
-                                            <a href="/admin/product" class="dropdown-item">
-                                                <i class="fas fa-user-cog me-2"></i> Trang quản lý Nhân viên
-                                            </a>
+                                            <li>
+                                                <a href="/admin/product"
+                                                    class="dropdown-item dropdown-item-custom rounded mt-1">
+                                                    <i class="fas fa-tasks me-2 text-info"></i> Trang quản lý Nhân viên
+                                                </a>
+                                            </li>
                                         </sec:authorize>
+
                                         <li>
                                             <form method="post" action="/logout" class="m-0 p-0 mt-1">
                                                 <input type="hidden" name="${_csrf.parameterName}"
@@ -248,27 +279,99 @@
                         </c:choose>
                     </div>
                 </div>
-                </div>
             </nav>
+
             <script>
                 document.addEventListener("DOMContentLoaded", function () {
-                    // Lấy đường dẫn hiện tại (VD: "/", "/products", "/product/1")
+                    // 1. Logic kiểm tra và thêm class active cho thanh Menu
                     let currentPath = window.location.pathname;
                     let navLinks = document.querySelectorAll('.navbar-nav .nav-link-custom');
 
-                    // 1. Xóa class active ở tất cả các thẻ
                     navLinks.forEach(link => link.classList.remove('active'));
-
-                    // 2. So sánh và add lại class active vào đúng thẻ
                     if (currentPath.startsWith("/product")) {
-                        // Dành cho trang danh sách sản phẩm và chi tiết sản phẩm
                         document.querySelector('.navbar-nav a[href="/products"]')?.classList.add('active');
                     } else if (currentPath.startsWith("/about") || currentPath.startsWith("/policy")) {
-                        // Dành cho trang Về chúng tôi / Chính sách
                         document.querySelector('.navbar-nav a[href="/about"]')?.classList.add('active');
                     } else if (currentPath === "/") {
-                        // Dành cho trang chủ
                         document.querySelector('.navbar-nav a[href="/"]')?.classList.add('active');
                     }
+
+                    // 2. Logic gọi AJAX lấy thông báo (Chỉ chạy khi User đã đăng nhập)
+                    const isUserLoggedIn = "${not empty pageContext.request.remoteUser}" === "true";
+                    if (isUserLoggedIn) {
+                        fetchNotifications();
+                        // Thiết lập chạy ngầm cập nhật sau mỗi 30 giây để bắt dữ liệu mới mà không cần F5
+                        setInterval(fetchNotifications, 30000);
+                    }
+
+                    function fetchNotifications() {
+                        fetch('/api/notifications')
+                            .then(response => {
+                                if (!response.ok) throw new Error('Unauthorized');
+                                return response.json();
+                            })
+                            .then(data => {
+                                updateNotificationUI(data.notifications, data.unreadCount);
+                            })
+                            .catch(err => console.log('Chưa đăng nhập hoặc lỗi hệ thống tải thông báo.'));
+                    }
+
+                    function updateNotificationUI(notifications, unreadCount) {
+                        const badge = document.getElementById('notificationBadge');
+                        const list = document.getElementById('notificationList');
+
+                        // Hiển thị badge số lượng chưa đọc
+                        if (unreadCount > 0) {
+                            badge.innerText = unreadCount;
+                            badge.classList.remove('d-none');
+                        } else {
+                            badge.classList.add('d-none');
+                        }
+
+                        // Hiển thị danh sách thông báo
+                        if (notifications.length === 0) {
+                            list.innerHTML = '<li><span class="dropdown-item text-center text-muted">Không có thông báo nào</span></li>';
+                            return;
+                        }
+
+                        list.innerHTML = '';
+                        notifications.forEach(notif => {
+                            const isReadClass = notif.read ? 'text-muted' : 'fw-bold bg-light';
+                            const dot = notif.read ? '' : '<span class="text-danger ms-2">●</span>';
+
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                    <a href="#" class="dropdown-item border-bottom py-2 \${isReadClass}" style="white-space: normal;" onclick="handleNotificationClick(event, \${notif.id}, \${notif.orderId})">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-primary" style="font-size: 0.95rem;">\${notif.title} \${dot}</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #444; line-height: 1.4;">\${notif.content}</div>
+                        <div class="text-muted mt-1" style="font-size: 0.75rem;">
+                            <i class="far fa-clock me-1"></i> \${notif.createdAt}
+                        </div>
+                    </a>
+                `;
+                            list.appendChild(li);
+                        });
+                    }
+
+                    // Đánh dấu thông báo là đã đọc bằng POST và chuyển hướng trang chi tiết
+                    window.handleNotificationClick = function (event, notifId, orderId) {
+                        event.preventDefault();
+                        let csrfToken = document.querySelector('input[name="_csrf"]');
+                        let headers = { 'Content-Type': 'application/json' };
+                        if (csrfToken) {
+                            headers['X-CSRF-TOKEN'] = csrfToken.value;
+                        }
+
+                        fetch('/api/notifications/read/' + notifId, {
+                            method: 'POST',
+                            headers: headers
+                        }).then(() => {
+                            window.location.href = '/order-history/' + orderId;
+                        }).catch(err => {
+                            window.location.href = '/order-history/' + orderId;
+                        });
+                    };
                 });
             </script>

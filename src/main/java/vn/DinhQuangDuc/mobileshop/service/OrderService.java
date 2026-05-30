@@ -25,12 +25,14 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
+    private final NotificationService notificationService;
 
     public OrderService(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository,
-            ProductRepository productRepository) {
+            ProductRepository productRepository, NotificationService notificationService) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.productRepository = productRepository;
+        this.notificationService = notificationService;
     }
 
     public List<Order> fetchAllOrders() {
@@ -88,8 +90,14 @@ public class OrderService {
             if ("SHIPPING".equals(newStatus)) {
                 currentOrder.setShippingDate(now);
                 currentOrder.setExpectedDeliveryDate(now.plusDays(3));
+                if (!"SHIPPING".equals(oldStatus)) {
+                    this.notificationService.createOrderShippingNotification(currentOrder);
+                }
             } else if ("DELIVERED".equals(newStatus) || "SUCCESS".equals(newStatus)) {
                 currentOrder.setDeliveredDate(now);
+                if (!"DELIVERED".equals(oldStatus) && !"SUCCESS".equals(oldStatus)) {
+                    this.notificationService.createOrderDeliveredNotification(currentOrder);
+                }
             } else if ("CANCELLED".equals(newStatus)) {
                 currentOrder.setCancelledDate(now);
             }
@@ -105,8 +113,6 @@ public class OrderService {
         if (orderOptional.isPresent()) {
             Order order = orderOptional.get();
 
-            // SỬA LỖI: Hoàn lại số lượng tồn kho nếu đơn hàng bị xóa cứng trực tiếp (mà
-            // chưa từng bị hủy)
             if (!"CANCELLED".equals(order.getStatus())) {
                 List<OrderDetail> details = order.getOrderDetails();
                 for (OrderDetail cd : details) {
@@ -127,8 +133,14 @@ public class OrderService {
         }
     }
 
+    // ĐÃ CẬP NHẬT: Thêm thuật toán Lambda tự động đảo thứ tự đơn hàng mới nhất lên
+    // đầu dựa vào thuộc tính ID
     public List<Order> fetchOrderByUser(User user) {
-        return this.orderRepository.findByUser(user);
+        List<Order> orders = this.orderRepository.findByUser(user);
+        if (orders != null && !orders.isEmpty()) {
+            orders.sort((o1, o2) -> Long.compare(o2.getId(), o1.getId()));
+        }
+        return orders;
     }
 
     public void saveOrder(Order order) {
@@ -171,16 +183,23 @@ public class OrderService {
     public void updateOrderStatus(long orderId, String newStatus) {
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order != null) {
+            String oldStatus = order.getStatus() == null ? "" : order.getStatus();
             order.setStatus(newStatus);
             LocalDateTime now = LocalDateTime.now();
             switch (newStatus) {
                 case "SHIPPING":
                     order.setShippingDate(now);
                     order.setExpectedDeliveryDate(now.plusDays(3));
+                    if (!"SHIPPING".equals(oldStatus)) {
+                        this.notificationService.createOrderShippingNotification(order);
+                    }
                     break;
                 case "DELIVERED":
                 case "SUCCESS":
                     order.setDeliveredDate(now);
+                    if (!"DELIVERED".equals(oldStatus) && !"SUCCESS".equals(oldStatus)) {
+                        this.notificationService.createOrderDeliveredNotification(order);
+                    }
                     break;
                 case "CANCELLED":
                     order.setCancelledDate(now);

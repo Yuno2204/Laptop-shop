@@ -57,7 +57,6 @@ public class ItemController {
             @PathVariable long id,
             @RequestParam(value = "quantity", defaultValue = "1") long quantity,
             HttpServletRequest request) {
-        // [Giữ nguyên code hiện tại]
         Map<String, Object> response = new HashMap<>();
         try {
             HttpSession session = request.getSession(false);
@@ -92,7 +91,7 @@ public class ItemController {
 
     @GetMapping("/cart")
     public String getCartPage(Model model, HttpServletRequest request,
-            @RequestParam(value = "keyword", required = false) String keyword) { // Thêm param keyword
+            @RequestParam(value = "keyword", required = false) String keyword) {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null) {
@@ -105,13 +104,12 @@ public class ItemController {
         Cart cart = this.productService.fetchByUser(currentUser);
         List<CartDetail> cartDetails = cart == null ? new ArrayList<CartDetail>() : cart.getCartDetails();
 
-        // LOGIC TÌM KIẾM SẢN PHẨM TRONG GIỎ HÀNG
         if (keyword != null && !keyword.trim().isEmpty()) {
             String finalKeyword = keyword.trim().toLowerCase();
             cartDetails = cartDetails.stream()
                     .filter(cd -> cd.getProduct().getName().toLowerCase().contains(finalKeyword))
                     .collect(Collectors.toList());
-            model.addAttribute("keyword", keyword.trim()); // Lưu lại trạng thái keyword cho giao diện
+            model.addAttribute("keyword", keyword.trim());
         }
 
         double totalPrice = 0;
@@ -121,13 +119,13 @@ public class ItemController {
 
         model.addAttribute("cartDetails", cartDetails);
         model.addAttribute("totalPrice", totalPrice);
-        model.addAttribute("cart", cart); // cart.getCartDetails() vẫn giữ nguyên, không bị thay đổi trong DB
+        model.addAttribute("cart", cart);
         return "client/cart/show";
     }
 
     @PostMapping("/delete-cart-product/{id}")
     public String deleteCartDetail(@PathVariable long id, HttpServletRequest request,
-            @RequestParam(value = "keyword", required = false) String keyword) { // Thêm param keyword
+            @RequestParam(value = "keyword", required = false) String keyword) {
 
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -135,18 +133,14 @@ public class ItemController {
         }
         this.productService.handleRemoveCartDetail(id, session);
 
-        // Nếu đang ở trạng thái tìm kiếm, giữ nguyên query sau khi xóa
         if (keyword != null && !keyword.trim().isEmpty()) {
             return "redirect:/cart?keyword=" + keyword.trim();
         }
         return "redirect:/cart";
     }
 
-    // Các phương thức khác: /checkout, /confirm-checkout, /place-order,
-    // order-history... giữ nguyên hoàn toàn
     @GetMapping("/checkout")
     public String getCheckOutPage(Model model, HttpServletRequest request) {
-        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null) {
             return "redirect:/login";
@@ -184,7 +178,6 @@ public class ItemController {
     public String confirmCheckout(@ModelAttribute("cart") Cart cart,
             @RequestParam(value = "selectedCartDetailIds", required = false) List<Long> selectedCartDetailIds,
             HttpServletRequest request) {
-        // [Giữ nguyên code hiện tại]
         if (selectedCartDetailIds == null || selectedCartDetailIds.isEmpty()) {
             return "redirect:/cart";
         }
@@ -202,7 +195,6 @@ public class ItemController {
             @RequestParam("receiverAddress") String receiverAddress,
             @RequestParam("receiverPhone") String receiverPhone,
             RedirectAttributes redirectAttributes) {
-        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
@@ -232,9 +224,11 @@ public class ItemController {
         return "client/cart/thanks";
     }
 
+    // ĐÃ CẬP NHẬT: Thêm tính năng phân trang cho Lịch sử mua hàng (10 đơn hàng /
+    // trang)
     @GetMapping("/order-history")
-    public String getOrderHistoryPage(Model model, HttpServletRequest request) {
-        // [Giữ nguyên code hiện tại]
+    public String getOrderHistoryPage(Model model, HttpServletRequest request,
+            @RequestParam(value = "page", defaultValue = "1") int page) {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
@@ -242,14 +236,37 @@ public class ItemController {
         long userId = (long) session.getAttribute("id");
         User currentUser = this.userService.getUserByID(userId);
 
+        // Lấy danh sách đơn hàng đã được sắp xếp mới nhất lên trên từ Service
         List<Order> orders = this.orderService.fetchOrderByUser(currentUser);
-        model.addAttribute("orders", orders);
+
+        int pageSize = 10;
+        int totalItems = orders.size();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+
+        if (totalPages == 0)
+            totalPages = 1;
+        if (page < 1)
+            page = 1;
+        if (page > totalPages)
+            page = totalPages;
+
+        int startItem = (page - 1) * pageSize;
+        int endItem = Math.min(startItem + pageSize, totalItems);
+
+        List<Order> pagedOrders = new ArrayList<>();
+        if (totalItems > 0) {
+            pagedOrders = orders.subList(startItem, endItem);
+        }
+
+        model.addAttribute("orders", pagedOrders);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
         return "client/cart/order-history";
     }
 
     @GetMapping("/order-history/{id}")
     public String getOrderDetailPage(Model model, HttpServletRequest request, @PathVariable long id) {
-        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
@@ -273,7 +290,6 @@ public class ItemController {
             @RequestParam("receiverAddress") String receiverAddress,
             @RequestParam("receiverPhone") String receiverPhone,
             RedirectAttributes ra) {
-        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
@@ -298,7 +314,6 @@ public class ItemController {
     @PostMapping("/order-history/cancel")
     public String cancelOrder(HttpServletRequest request, @RequestParam("orderId") long orderId,
             RedirectAttributes ra) {
-        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null)
             return "redirect:/login";
@@ -332,7 +347,6 @@ public class ItemController {
             @RequestParam("cartDetailId") long cartDetailId,
             @RequestParam("quantity") long quantity,
             HttpServletRequest request) {
-        // [Giữ nguyên code hiện tại]
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null) {
             Map<String, Object> error = new HashMap<>();

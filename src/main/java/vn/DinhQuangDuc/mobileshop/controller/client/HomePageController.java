@@ -41,8 +41,15 @@ public class HomePageController {
     }
 
     @GetMapping("/")
-    public String getMethodName(Model model) {
+    public String getHomePage(Model model) {
         List<Product> products = this.productService.fetchProducts();
+        if (products != null && !products.isEmpty()) {
+            products.sort((p1, p2) -> {
+                long sold1 = p1.getSold();
+                long sold2 = p2.getSold();
+                return Long.compare(sold2, sold1);
+            });
+        }
         model.addAttribute("products", products);
         return "client/homepage/show";
     }
