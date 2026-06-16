@@ -120,9 +120,6 @@
                                                             <form:option value="Apple">Apple</form:option>
                                                             <form:option value="Samsung">Samsung</form:option>
                                                             <form:option value="Xiaomi">Xiaomi</form:option>
-                                                            <form:option value="Oppo">Oppo</form:option>
-                                                            <form:option value="Vivo">Vivo</form:option>
-                                                            <form:option value="Nokia">Nokia</form:option>
                                                         </form:select>
                                                         <form:errors path="factory"
                                                             cssClass="text-danger d-block mt-1" />

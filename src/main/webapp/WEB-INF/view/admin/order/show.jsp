@@ -132,7 +132,8 @@
                                                                         </td>
                                                                         <td>
                                                                             <a href="/admin/order/${order.id}"
-                                                                                class="btn btn-success btn-sm">Xem</a>
+                                                                                class="btn btn-success btn-sm">Xem chi
+                                                                                tiết</a>
                                                                             <a href="/admin/order/update/${order.id}"
                                                                                 class="btn btn-warning btn-sm">Cập
                                                                                 nhật</a>

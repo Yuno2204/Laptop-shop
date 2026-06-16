@@ -7,6 +7,7 @@
             <head>
                 <meta charset="UTF-8">
                 <title>Sản phẩm - LongHang Mobile</title>
+
                 <link rel="preconnect" href="https://fonts.googleapis.com">
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
                 <link
@@ -20,15 +21,13 @@
                 <link href="/client/css/bootstrap.min.css" rel="stylesheet">
                 <link href="/client/css/style.css" rel="stylesheet">
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
                 <style>
                     body {
                         background-color: #f4f6f8;
-                        /* Đã xóa font-family lỗi */
                         padding-top: 100px;
-                        /* Thêm padding để không bị Header đè */
                     }
 
-                    /* THANH TÌM KIẾM CỐ ĐỊNH TRÊN CÙNG */
                     .search-box {
                         position: relative;
                         margin-bottom: 25px;
@@ -60,7 +59,6 @@
                         font-size: 16px;
                     }
 
-                    /* SIDEBAR CHUYÊN NGHIỆP */
                     .filter-sidebar {
                         background: #fff;
                         border-radius: 16px;
@@ -107,7 +105,6 @@
                         text-transform: uppercase;
                     }
 
-                    /* TAG BUTTONS */
                     .filter-checkbox {
                         display: none;
                     }
@@ -139,7 +136,6 @@
                         font-weight: 600;
                     }
 
-                    /* SELECT OPTION */
                     .form-select {
                         border-radius: 8px;
                         font-size: 13px;
@@ -152,7 +148,6 @@
                         box-shadow: none;
                     }
 
-                    /* CỤM NÚT FILTER ACTION */
                     .filter-actions {
                         display: flex;
                         gap: 10px;
@@ -195,7 +190,6 @@
                         border-color: #999;
                     }
 
-                    /* PRODUCT CARD */
                     .product-card {
                         background: #fff;
                         border-radius: 16px;
@@ -264,7 +258,6 @@
                         font-weight: 500;
                     }
 
-                    /* SORT BUTTON */
                     .sort-btn {
                         border: 1px solid #e0e0e0;
                         background: #fff;
@@ -323,9 +316,6 @@
                                             <option value="Apple">Apple</option>
                                             <option value="Samsung">Samsung</option>
                                             <option value="Xiaomi">Xiaomi</option>
-                                            <option value="Oppo">Oppo</option>
-                                            <option value="Vivo">Vivo</option>
-                                            <option value="Nokia">Nokia</option>
                                         </select>
                                     </div>
 
@@ -347,17 +337,28 @@
                                         <div class="filter-title">Mức giá</div>
                                         <div class="d-flex flex-wrap gap-2">
                                             <input type="radio" class="filter-checkbox" name="price" value="" id="p0"
-                                                checked><label class="filter-label" for="p0">Tất cả</label>
+                                                checked>
+                                            <label class="filter-label" for="p0">Tất cả</label>
+
                                             <input type="radio" class="filter-checkbox" name="price" value="0-5"
-                                                id="p1"><label class="filter-label" for="p1">Dưới 5 triệu</label>
+                                                id="p1">
+                                            <label class="filter-label" for="p1">Dưới 5 triệu</label>
+
                                             <input type="radio" class="filter-checkbox" name="price" value="5-10"
-                                                id="p2"><label class="filter-label" for="p2">Từ 5 - 10 triệu</label>
+                                                id="p2">
+                                            <label class="filter-label" for="p2">Từ 5 - 10 triệu</label>
+
                                             <input type="radio" class="filter-checkbox" name="price" value="10-20"
-                                                id="p3"><label class="filter-label" for="p3">Từ 10 - 20 triệu</label>
+                                                id="p3">
+                                            <label class="filter-label" for="p3">Từ 10 - 20 triệu</label>
+
                                             <input type="radio" class="filter-checkbox" name="price" value="20-30"
-                                                id="p4"><label class="filter-label" for="p4">Từ 20 - 30 triệu</label>
+                                                id="p4">
+                                            <label class="filter-label" for="p4">Từ 20 - 30 triệu</label>
+
                                             <input type="radio" class="filter-checkbox" name="price" value="30-max"
-                                                id="p5"><label class="filter-label" for="p5">Trên 30 triệu</label>
+                                                id="p5">
+                                            <label class="filter-label" for="p5">Trên 30 triệu</label>
                                         </div>
                                     </div>
 
@@ -408,17 +409,21 @@
                                         <div class="filter-title">Kích thước màn hình</div>
                                         <div class="d-flex flex-wrap gap-2">
                                             <input type="checkbox" class="filter-checkbox" name="screenSize"
-                                                value="Dưới 6 inch" id="s1"><label class="filter-label" for="s1">
+                                                value="Dưới 6 inch" id="s1">
+                                            <label class="filter-label" for="s1">
                                                 < 6"</label>
+
                                                     <input type="checkbox" class="filter-checkbox" name="screenSize"
-                                                        value="6.0 - 6.4 inch" id="s2"><label class="filter-label"
-                                                        for="s2">6.0 - 6.4"</label>
+                                                        value="6.0 - 6.4 inch" id="s2">
+                                                    <label class="filter-label" for="s2">6.0 - 6.4"</label>
+
                                                     <input type="checkbox" class="filter-checkbox" name="screenSize"
-                                                        value="6.5 - 6.7 inch" id="s3"><label class="filter-label"
-                                                        for="s3">6.5 - 6.7"</label>
+                                                        value="6.5 - 6.7 inch" id="s3">
+                                                    <label class="filter-label" for="s3">6.5 - 6.7"</label>
+
                                                     <input type="checkbox" class="filter-checkbox" name="screenSize"
-                                                        value="Trên 6.7 inch" id="s4"><label class="filter-label"
-                                                        for="s4">> 6.7"</label>
+                                                        value="Trên 6.7 inch" id="s4">
+                                                    <label class="filter-label" for="s4">> 6.7"</label>
                                         </div>
                                     </div>
 
@@ -426,17 +431,21 @@
                                         <div class="filter-title">Dung lượng pin</div>
                                         <div class="d-flex flex-wrap gap-2">
                                             <input type="checkbox" class="filter-checkbox" name="battery"
-                                                value="Dưới 4000mAh" id="b1"><label class="filter-label" for="b1">
+                                                value="Dưới 4000mAh" id="b1">
+                                            <label class="filter-label" for="b1">
                                                 < 4000mAh</label>
+
                                                     <input type="checkbox" class="filter-checkbox" name="battery"
-                                                        value="4000 - 5000mAh" id="b2"><label class="filter-label"
-                                                        for="b2">4000 - 5000mAh</label>
+                                                        value="4000 - 5000mAh" id="b2">
+                                                    <label class="filter-label" for="b2">4000 - 5000mAh</label>
+
                                                     <input type="checkbox" class="filter-checkbox" name="battery"
-                                                        value="5000 - 6000mAh" id="b3"><label class="filter-label"
-                                                        for="b3">5000 - 6000mAh</label>
+                                                        value="5000 - 6000mAh" id="b3">
+                                                    <label class="filter-label" for="b3">5000 - 6000mAh</label>
+
                                                     <input type="checkbox" class="filter-checkbox" name="battery"
-                                                        value="Trên 6000mAh" id="b4"><label class="filter-label"
-                                                        for="b4">> 6000mAh</label>
+                                                        value="Trên 6000mAh" id="b4">
+                                                    <label class="filter-label" for="b4">> 6000mAh</label>
                                         </div>
                                     </div>
                                 </div>
@@ -488,21 +497,16 @@
                                                 <form action="/add-product-to-cart/${product.id}" method="post">
                                                     <input type="hidden" name="${_csrf.parameterName}"
                                                         value="${_csrf.token}" />
-
                                                     <c:choose>
                                                         <c:when test="${empty sessionScope.email}">
                                                             <button type="button" onclick="requireLogin()"
                                                                 class="btn btn-outline-danger w-100 rounded-pill fw-bold"
-                                                                style="font-size: 13px;">
-                                                                Thêm vào giỏ hàng
-                                                            </button>
+                                                                style="font-size: 13px;">Thêm vào giỏ hàng</button>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <button type="submit"
                                                                 class="btn btn-outline-danger w-100 rounded-pill fw-bold"
-                                                                style="font-size: 13px;">
-                                                                Thêm vào giỏ hàng
-                                                            </button>
+                                                                style="font-size: 13px;">Thêm vào giỏ hàng</button>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </form>
@@ -510,77 +514,61 @@
                                         </div>
                                     </div>
                                 </c:forEach>
-
                             </div>
-                            <c:if test="${totalPages > 1}">
-                                <nav class="mt-5 d-flex justify-content-center">
-                                    <%-- Thêm d-flex và flex-row vào ul để ép các thẻ li nằm ngang --%>
+
+                            <%-- PHÂN TRANG DUY NHẤT CỦA TRANG WEB --%>
+                                <nav id="pagination" class="mt-5 d-flex justify-content-center">
+                                    <c:if test="${totalPages > 1}">
                                         <ul class="pagination custom-pagination mb-0 d-flex flex-row">
-
-                                            <%-- Mũi tên TRƯỚC --%>
-                                                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                                    <a class="page-link" href="/products?page=${currentPage - 1}"
-                                                        aria-label="Previous">
-                                                        <i class="fas fa-chevron-left"></i>
-                                                    </a>
+                                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                                <a class="page-link" href="/products?page=${currentPage - 1}"
+                                                    aria-label="Previous">
+                                                    <i class="fas fa-chevron-left"></i>
+                                                </a>
+                                            </li>
+                                            <c:forEach begin="1" end="${totalPages}" varStatus="loop">
+                                                <li class="page-item ${currentPage == loop.index ? 'active' : ''}">
+                                                    <a class="page-link"
+                                                        href="/products?page=${loop.index}">${loop.index}</a>
                                                 </li>
-
-                                                <%-- Danh sách số trang --%>
-                                                    <c:forEach begin="1" end="${totalPages}" varStatus="loop">
-                                                        <li
-                                                            class="page-item ${currentPage == loop.index ? 'active' : ''}">
-                                                            <a class="page-link"
-                                                                href="/products?page=${loop.index}">${loop.index}</a>
-                                                        </li>
-                                                    </c:forEach>
-
-                                                    <%-- Mũi tên SAU --%>
-                                                        <li
-                                                            class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                                            <a class="page-link"
-                                                                href="/products?page=${currentPage + 1}"
-                                                                aria-label="Next">
-                                                                <i class="fas fa-chevron-right"></i>
-                                                            </a>
-                                                        </li>
-
+                                            </c:forEach>
+                                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                                <a class="page-link" href="/products?page=${currentPage + 1}"
+                                                    aria-label="Next">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </a>
+                                            </li>
                                         </ul>
+                                    </c:if>
                                 </nav>
-                            </c:if>
 
-                            <nav id="pagination" class="mt-5 d-flex justify-content-center"></nav>
                         </div>
                     </div>
                 </div>
 
                 <jsp:include page="../layout/footer.jsp" />
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 
-                <script src="/client/js/product-filter.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+                <%-- Gắn đuôi ?v=5 để tự động nhận code JS mới nhất --%>
+                    <script src="/client/js/product-filter.js?v=5"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-                <script>
-                    function requireLogin() {
-                        // Cấu hình hiển thị cho Toastr
-                        toastr.options = {
-                            "closeButton": true,
-                            "progressBar": true,
-                            "positionClass": "toast-top-right",
-                            "timeOut": "2000" // Hiển thị 2 giây
-                        };
-
-                        // Hiện thông báo cảnh báo
-                        toastr.warning('Bạn cần phải đăng nhập để mua hàng!', 'Thông báo');
-
-                        // Chờ 2 giây để người dùng đọc thông báo rồi mới tự động chuyển hướng sang trang đăng nhập
-                        setTimeout(function () {
-                            window.location.href = '/login';
-                        }, 2000);
-                    }
-                </script>
-
+                    <script>
+                        function requireLogin() {
+                            toastr.options = {
+                                "closeButton": true,
+                                "progressBar": true,
+                                "positionClass": "toast-top-right",
+                                "timeOut": "2000"
+                            };
+                            toastr.warning('Bạn cần phải đăng nhập để mua hàng!', 'Thông báo');
+                            setTimeout(function () {
+                                window.location.href = '/login';
+                            }, 2000);
+                        }
+                    </script>
             </body>
 
             </html>

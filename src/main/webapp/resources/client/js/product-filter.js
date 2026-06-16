@@ -47,12 +47,12 @@ $(document).ready(function() {
         });
     }
 
-    // Render Sản phẩm (ĐÃ SỬA LỖI LẶP CODE)
+    // Render Sản phẩm 
     function renderProducts(products) {
         const productGrid = document.getElementById('productGrid');
         productGrid.innerHTML = "";
 
-      if (!products || products.length === 0) {
+        if (!products || products.length === 0) {
             productGrid.innerHTML = `
                 <div class="col-12 d-flex flex-column justify-content-center align-items-center text-center w-100" style="min-height: 50vh;">
                     <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" width="120" style="opacity:0.5; margin-bottom:20px;">
@@ -87,7 +87,7 @@ $(document).ready(function() {
                         
                         <form action="/add-product-to-cart/${p.id}" method="post">
                             <input type="hidden" name="_csrf" value="${csrfToken}" />
-                            <button type="submit" class="btn btn-outline-danger w-100 rounded-pill fw-bold py-2" style="font-size: 13px;">Mua ngay</button>
+                            <button type="submit" class="btn btn-outline-danger w-100 rounded-pill fw-bold py-2" style="font-size: 13px;">Thêm vào giỏ hàng</button>
                         </form>
                     </div>
                 </div>
@@ -97,19 +97,39 @@ $(document).ready(function() {
         $('#productGrid').hide().html(html).fadeIn(500);
     }
 
-    // Render Phân Trang
+    // Render Phân Trang Y HỆT BẢN GỐC
     function renderPagination(pageData) {
         const pag = document.getElementById('pagination');
+        if (!pag) return;
         pag.innerHTML = "";
+        
         if (!pageData || pageData.totalPages <= 1) return;
         
-        let html = '<ul class="pagination pagination-md shadow-sm">';
+        let html = '<ul class="pagination custom-pagination mb-0 d-flex flex-row">';
+        
+        // Mũi tên trước
+        let prevDisabled = (pageData.number === 0) ? 'disabled' : '';
+        html += `<li class="page-item ${prevDisabled}">
+                    <a class="page-link" href="javascript:void(0)" onclick="changePage(${pageData.number - 1})" aria-label="Previous">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                 </li>`;
+
+        // Các số trang
         for (let i = 0; i < pageData.totalPages; i++) {
             html += `<li class="page-item ${i === pageData.number ? 'active' : ''}">
-                        <a class="page-link shadow-none ${i === pageData.number ? 'bg-danger border-danger text-white' : 'text-dark'}" 
-                           href="javascript:void(0)" onclick="changePage(${i})">${i + 1}</a>
+                        <a class="page-link" href="javascript:void(0)" onclick="changePage(${i})">${i + 1}</a>
                      </li>`;
         }
+
+        // Mũi tên sau
+        let nextDisabled = (pageData.number === pageData.totalPages - 1) ? 'disabled' : '';
+        html += `<li class="page-item ${nextDisabled}">
+                    <a class="page-link" href="javascript:void(0)" onclick="changePage(${pageData.number + 1})" aria-label="Next">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                 </li>`;
+
         html += '</ul>';
         pag.innerHTML = html;
     }
@@ -126,15 +146,15 @@ $(document).ready(function() {
         $('.filter-checkbox').prop('checked', false);
         $('select.form-select').val(''); 
         $('#searchInput').val('');
-        $('#p0').prop('checked', true); // Tick lại 'Tất cả' khoảng giá
+        $('#p0').prop('checked', true); 
         
         $('.sort-btn').removeClass('active');
         $('[data-sort="newest"]').addClass('active');
         
-        fetchFilteredProducts(0); // Call API reset về mặc định
+        fetchFilteredProducts(0); 
     });
 
-    // 3. Thanh tìm kiếm: Chỉ chạy khi ấn Enter
+    // 3. Thanh tìm kiếm
     $('#searchInput').on('keypress', function(e) {
         if (e.which === 13) { 
             fetchFilteredProducts(0);

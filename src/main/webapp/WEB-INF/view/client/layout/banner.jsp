@@ -147,7 +147,7 @@
 
                             <div class="carousel-inner" role="listbox">
                                 <div class="carousel-item active p-4">
-                                    <img src="/client/img/1.png" class="img-fluid w-100 object-fit-contain floating-img"
+                                    <img src="/client/img/7.png" class="img-fluid w-100 object-fit-contain floating-img"
                                         style="height: 350px;" alt="iPhone">
                                     <span
                                         class="position-absolute top-0 end-0 m-3 badge bg-danger px-3 py-2 fs-6 rounded-pill shadow-sm">
@@ -156,7 +156,7 @@
                                 </div>
 
                                 <div class="carousel-item p-4">
-                                    <img src="/client/img/2.png" class="img-fluid w-100 object-fit-contain floating-img"
+                                    <img src="/client/img/6.png" class="img-fluid w-100 object-fit-contain floating-img"
                                         style="height: 350px;" alt="Samsung">
                                     <span
                                         class="position-absolute top-0 end-0 m-3 badge bg-dark px-3 py-2 fs-6 rounded-pill shadow-sm">
@@ -165,11 +165,11 @@
                                 </div>
 
                                 <div class="carousel-item p-4">
-                                    <img src="/client/img/3.png" class="img-fluid w-100 object-fit-contain floating-img"
-                                        style="height: 350px;" alt="OPPO">
+                                    <img src="/client/img/4.png" class="img-fluid w-100 object-fit-contain floating-img"
+                                        style="height: 350px;" alt="Xiaomi">
                                     <span class="position-absolute top-0 end-0 m-3 badge"
                                         style="background: #e91e63; padding: .5rem 1rem; font-size: 1rem; border-radius: 50rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">
-                                        <i class="fas fa-mobile-alt me-1"></i> OPPO
+                                        <i class="fas fa-mobile-alt me-1"></i> Xiaomi
                                     </span>
                                 </div>
                             </div>

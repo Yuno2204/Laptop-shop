@@ -310,9 +310,12 @@
                                                                                     id="hidden-qty-${cartDetail.id}" />
                                                                             </c:forEach>
                                                                         </div>
+                                                                        <button type="button" id="btn-confirm-checkout"
+                                                                            style="display: none;"></button>
+
                                                                         <button
                                                                             class="btn btn-primary rounded-pill w-100 py-3 fw-bold text-uppercase shadow"
-                                                                            type="button" id="btn-confirm-checkout">
+                                                                            type="button" id="real-checkout-btn">
                                                                             Xác nhận đơn hàng <i
                                                                                 class="fas fa-arrow-right ms-2"></i>
                                                                         </button>
@@ -507,24 +510,64 @@
                             if (currentVal > 1) updateQuantityAjax($input, currentVal - 1);
                         });
 
-                        $('#btn-confirm-checkout').on('click', function (e) {
+                        $('#real-checkout-btn').on('click', function (e) {
                             e.preventDefault();
                             var selectedIds = [];
+
+                            // Gom các ID sản phẩm được tích chọn
                             $('.item-checkbox:checked').each(function () {
                                 selectedIds.push($(this).val());
                             });
 
+                            // 1. NẾU CHƯA CHỌN SẢN PHẨM NÀO
                             if (selectedIds.length === 0) {
-                                toastr.warning('Vui lòng chọn ít nhất một sản phẩm để đặt hàng!', 'Chưa chọn sản phẩm');
-                                return;
+                                // Tăng thời gian hiện thông báo lên 2 giây (2000ms)
+                                toastr.warning('Vui lòng tích chọn ít nhất một sản phẩm ở bên trái để đặt hàng!', 'Chưa chọn sản phẩm', {
+                                    timeOut: 2000,
+                                    closeButton: true,
+                                    progressBar: true
+                                });
+
+                                // Tạo hiệu ứng phát sáng viền đỏ cho các ô checkbox để nhắc người dùng
+                                $('.item-checkbox').css({
+                                    'box-shadow': '0 0 10px red',
+                                    'border': '2px solid red',
+                                    'transition': 'all 0.3s'
+                                });
+                                // Tự động tắt hiệu ứng đỏ sau 2 giây
+                                setTimeout(function () {
+                                    $('.item-checkbox').css({ 'box-shadow': 'none', 'border': 'none' });
+                                }, 1000);
+
+                                return; // Dừng lại tại đây
                             }
 
+                            // 2. NẾU ĐÃ CHỌN SẢN PHẨM: Đồng bộ số lượng mới nhất
+                            $('input[data-cart-detail-id]').each(function () {
+                                var id = $(this).attr("data-cart-detail-id");
+                                var hiddenInput = $("#hidden-qty-" + id);
+                                if (hiddenInput.length > 0) {
+                                    hiddenInput.val($(this).val());
+                                }
+                            });
+
+                            // 3. Đưa ID sản phẩm vào form
                             var form = $('#confirm-checkout-form');
                             form.find('input[name="selectedCartDetailIds"]').remove();
                             selectedIds.forEach(function (id) {
                                 form.append('<input type="hidden" name="selectedCartDetailIds" value="' + id + '">');
                             });
-                            form.submit();
+
+                            // 4. HIỆU ỨNG LOADING (CHỐNG ĐƠ)
+                            // Đổi chữ nút thành Đang xử lý và khóa nút lại tránh bấm 2 lần
+                            var $btn = $(this);
+                            $btn.html('Đang xử lý... <i class="fas fa-spinner fa-spin ms-2"></i>').prop('disabled', true);
+
+                            // Kích hoạt màn hình xoay tròn loading của web
+                            $('#spinner').addClass('show');
+
+                            // Gửi form đi bằng lệnh gốc của trình duyệt
+                            form[0].submit();
                         });
 
                         $('.btn-delete-cart').on('click', function () {
